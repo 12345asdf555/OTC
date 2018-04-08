@@ -79,7 +79,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 	            	}
          		
 					socketChannel = SocketChannel.open(); 
-	                SocketAddress socketAddress = new InetSocketAddress(ip, 5550);    
+	                SocketAddress socketAddress = new InetSocketAddress(ip, 5555);    
 	                socketChannel.connect(socketAddress);
          	}
  		
