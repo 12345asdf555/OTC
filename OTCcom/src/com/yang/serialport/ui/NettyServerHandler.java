@@ -10,15 +10,30 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JTextArea;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.CharsetUtil;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler.Sharable;
 @Sharable 
 public class NettyServerHandler extends ChannelHandlerAdapter{
@@ -33,6 +48,11 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
     public ArrayList<String> listarray3 = new ArrayList<String>();
 	private SocketChannel socketChannel = null;
 	public JTextArea dataView = new JTextArea();
+	public SocketChannel chcli = null;
+	
+	public NettyServerHandler(){
+		
+	}
 	
 	 @Override  
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -43,7 +63,71 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
  		
  		 try {    
  			 
-         	if(socketChannel==null){
+ 			/*try {
+				FileInputStream in = new FileInputStream("IPconfig.txt");  
+	            InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+	            BufferedReader bufReader = new BufferedReader(inReader);  
+	            String line = null; 
+	            int writetime=0;
+				
+			    while((line = bufReader.readLine()) != null){ 
+			    	if(writetime==0){
+		                ip=line;
+		                writetime++;
+			    	}
+			    	else{
+			    		fitemid=line;
+			    		writetime=0;
+			    	}
+	            }  
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			   
+			if(fitemid.length()!=2){
+        		int count = 2-fitemid.length();
+        		for(int i=0;i<count;i++){
+        			fitemid="0"+fitemid;
+        		}
+        	}
+ 			 
+ 			 if(channel==null){
+ 				EventLoopGroup group = new NioEventLoopGroup(); 
+ 				try{
+ 					Bootstrap b = new Bootstrap(); 
+ 	 				b.group(group)
+ 	 					.channel(NioSocketChannel.class)
+ 	 					.remoteAddress(new InetSocketAddress(ip, 5550))
+ 	 					.handler(new ChannelInitializer<SocketChannel>() {
+
+ 							@Override
+ 							protected void initChannel(SocketChannel ch) throws Exception {
+ 								// TODO Auto-generated method stub
+ 								ch.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));    
+ 								ch.pipeline().addLast("frameEncoder", new LengthFieldPrepender(4));    
+ 								ch.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));    
+ 								ch.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));  
+ 								ch.pipeline().addLast(new TcpClientHandler());
+ 							}
+ 	 						
+ 	 					});  
+ 	 				
+ 	 				//等待同步成功  
+ 	 				ChannelFuture cf = b.connect().sync();
+ 	 				//等待关闭监听端口 
+ 	 				cf.channel().closeFuture().sync();
+ 	 				
+ 				} finally {
+ 					group.shutdownGracefully().sync();
+ 				}
+ 			 }*/
+ 			 
+         	/*if(socketChannel==null){
          		
          		try {
 						FileInputStream in = new FileInputStream("IPconfig.txt");  
@@ -79,11 +163,42 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 	            	}
          		
 					socketChannel = SocketChannel.open(); 
-	                SocketAddress socketAddress = new InetSocketAddress(ip, 5555);    
+	                SocketAddress socketAddress = new InetSocketAddress(ip, 5550);    
 	                socketChannel.connect(socketAddress);
-         	}
+         	}*/
  		
-         
+ 			try {
+				FileInputStream in = new FileInputStream("IPconfig.txt");  
+	            InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+	            BufferedReader bufReader = new BufferedReader(inReader);  
+	            String line = null; 
+	            int writetime=0;
+				
+			    while((line = bufReader.readLine()) != null){ 
+			    	if(writetime==0){
+		                ip=line;
+		                writetime++;
+			    	}
+			    	else{
+			    		fitemid=line;
+			    		writetime=0;
+			    	}
+	            }  
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			   
+			if(fitemid.length()!=2){
+        		int count = 2-fitemid.length();
+        		for(int i=0;i<count;i++){
+        			fitemid="0"+fitemid;
+        		}
+        	}
          
          	for(int i=0;i<req.length;i++){
              
@@ -107,26 +222,28 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
                  str+=r;  
               }
            }
-          
+         	
           str=str.substring(0,106)+fitemid+"F5";
          
           dataView.append(str + "\r\n");
           
-          byte[] data=new byte[str.length()/2];
+          /*byte[] data=new byte[str.length()/2];
           for (int i1 = 0; i1 < data.length; i1++)
           {
 	            String tstr1=str.substring(i1*2, i1*2+2);
 	            Integer k=Integer.valueOf(tstr1, 16);
 	            data[i1]=(byte)k.byteValue();
-          }
+          }*/
           
-          socketChannel.write(ByteBuffer.wrap(data));
+          chcli.writeAndFlush(str).sync();
+          //socketChannel.write(ByteBuffer.wrap(data));
          
           str = "";
           //System.out.println(str);
           
           //new Thread(work).start();
  		 } catch (Exception ex) {  
+ 			 ex.printStackTrace();
  			 socketChannel = null;
  			 dataView.setText("服务器未开启" + "\r\n");
          }

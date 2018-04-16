@@ -9,8 +9,10 @@ package com.yang.serialport.ui;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -18,6 +20,12 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.CharsetUtil;
 
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
@@ -57,6 +65,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -75,6 +84,8 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.pept.transport.ListenerThread;
 import com.yang.serialport.exception.NoSuchPort;
 import com.yang.serialport.exception.NotASerialPort;
 import com.yang.serialport.exception.PortInUse;
@@ -100,7 +111,6 @@ public class MainFrame extends JFrame {
     OutputStream outputStream;
     // Socket变量
     private Socket socket=null;
-    private Socket client=null;
     private Socket websocketlink=null;
     private ServerSocket serverSocket = null;
     public String IP;
@@ -112,6 +122,10 @@ public class MainFrame extends JFrame {
     public String datesend = "";
     public String msg;
     public NettyServerHandler NS = new NettyServerHandler();
+    public Client client = new Client(NS);
+    public TcpClientHandler TC = new TcpClientHandler();
+    public HashMap<String, SocketChannel> socketlist = new HashMap<>();
+    public int socketcount=0;
 
 	/**
 	 * 程序界面宽度
@@ -150,14 +164,114 @@ public class MainFrame extends JFrame {
     public int clientcount=0;
     public boolean Firsttime=true;
 	protected String fitemid;
-    
+	
 	public MainFrame() {
+		
+		new Thread(cli).start();
+		
 		initView();
 		initComponents();
 		actionListener();
 		initData();	
 	}
 
+	public Runnable cli =new Runnable(){
+
+		private String ip;
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			try{
+				
+				client.run();
+				
+				/*try {
+					FileInputStream in = new FileInputStream("IPconfig.txt");  
+		            InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+		            BufferedReader bufReader = new BufferedReader(inReader);  
+		            String line = null; 
+		            int writetime=0;
+					
+				    while((line = bufReader.readLine()) != null){ 
+				    	if(writetime==0){
+			                ip=line;
+			                writetime++;
+				    	}
+				    	else{
+				    		fitemid=line;
+				    		writetime=0;
+				    	}
+		            }  
+	
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				EventLoopGroup group = new NioEventLoopGroup(); 
+				
+				try{
+					Bootstrap b = new Bootstrap(); 
+	 				b.group(group)
+	 					.channel(NioSocketChannel.class)
+	 					.remoteAddress(new InetSocketAddress(ip, 5555))
+	 					.handler(new ChannelInitializer<SocketChannel>() {
+
+							@Override
+							protected void initChannel(SocketChannel chcli) throws Exception {
+								// TODO Auto-generated method stub
+								chcli.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));    
+								chcli.pipeline().addLast("frameEncoder", new LengthFieldPrepender(4));    
+								chcli.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));    
+								chcli.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));  
+								chcli.pipeline().addLast(TC);
+								NS.chcli=chcli;
+							}
+	 						
+	 					});  
+	 				//b.connect().addListener(new ConnectionListener(b));
+	 				//等待同步成功  
+	 				ChannelFuture cf = b.connect().sync();
+	 				//等待关闭监听端口 
+	 				cf.channel().closeFuture().sync();
+	 				
+				} catch (Exception ex) {  
+		 			ex.printStackTrace();
+		        } finally {
+					group.shutdownGracefully().sync();
+				}*/
+			 } catch (Exception ex) { 
+	 			 ex.printStackTrace();
+	         }
+		}
+	};
+	
+	
+	/*public class ConnectionListener implements ChannelFutureListener {  
+		  private Client client;  
+		  public ConnectionListener(Client client) {  
+		    this.client = client;  
+		  }  
+		  @Override  
+		  public void operationComplete(ChannelFuture channelFuture) throws Exception {  
+		    if (!channelFuture.isSuccess()) {  
+		      System.out.println("Reconnect");  
+		      final EventLoop loop = channelFuture.channel().eventLoop();  
+		      loop.schedule(new Runnable() {  
+		        @Override  
+		        public void run() {  
+		          client.createBootstrap(new Bootstrap(), loop);  
+		        }  
+		      }, 1L, TimeUnit.SECONDS);  
+		    }  
+		  }  
+		}*/
+	
+	
 	public void initView() {
 		// 关闭程序
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -288,16 +402,18 @@ public class MainFrame extends JFrame {
 	            
 	           
 	            b = b.childHandler(new ChannelInitializer<SocketChannel>() {
-	                @Override
-	                
-	                public void initChannel(SocketChannel ch) throws Exception {
-	                   ch.pipeline().addLast(NS);
+					@Override
+	                public void initChannel(SocketChannel chsoc) throws Exception {
+	                   chsoc.pipeline().addLast(NS);
+	                   socketcount++;
+	                   socketlist.put(Integer.toString(socketcount),chsoc);
+	                   TC.socketlist = socketlist;
 	                }
 	            });
 	            
 	            //绑定端口，等待同步成功  
 	            ChannelFuture f;
-				f = b.bind(5555).sync();
+				f = b.bind(5550).sync();
 	            //等待服务端关闭监听端口  
 	            f.channel().closeFuture().sync(); 
 	        } catch (InterruptedException e) {
