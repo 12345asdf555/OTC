@@ -32,7 +32,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		 String str = (String) msg;
-		 Iterator<Entry<String, SocketChannel>> webiter = socketlist.entrySet().iterator();
+		 Iterator<Entry<String, SocketChannel>> webiter = client.mainFrame.socketlist.entrySet().iterator();
          while(webiter.hasNext()){
          	try{
          		
@@ -40,6 +40,8 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
              	socketfail = entry.getKey();
              	SocketChannel socketcon = entry.getValue();
              	socketcon.writeAndFlush(Unpooled.copiedBuffer(str,CharsetUtil.UTF_8));
+             	
+             	client.mainFrame.DateView(str);
              	
          	}catch (Exception e) {
 					socketlist.remove(socketfail);

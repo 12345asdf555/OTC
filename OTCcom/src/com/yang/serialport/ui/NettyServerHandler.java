@@ -41,7 +41,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 	public String ip;
     public String str="";
     public String connet;
-    protected String fitemid;
+    public String fitemid;
     public HashMap<String, Socket> websocket;
     public ArrayList<String> listarray1 = new ArrayList<String>();
     public ArrayList<String> listarray2 = new ArrayList<String>();
@@ -49,10 +49,6 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 	private SocketChannel socketChannel = null;
 	public JTextArea dataView = new JTextArea();
 	public SocketChannel chcli = null;
-	
-	public NettyServerHandler(){
-		
-	}
 	
 	 @Override  
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -167,38 +163,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 	                socketChannel.connect(socketAddress);
          	}*/
  		
- 			try {
-				FileInputStream in = new FileInputStream("IPconfig.txt");  
-	            InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
-	            BufferedReader bufReader = new BufferedReader(inReader);  
-	            String line = null; 
-	            int writetime=0;
-				
-			    while((line = bufReader.readLine()) != null){ 
-			    	if(writetime==0){
-		                ip=line;
-		                writetime++;
-			    	}
-			    	else{
-			    		fitemid=line;
-			    		writetime=0;
-			    	}
-	            }  
-
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
-			   
-			if(fitemid.length()!=2){
-        		int count = 2-fitemid.length();
-        		for(int i=0;i<count;i++){
-        			fitemid="0"+fitemid;
-        		}
-        	}
+ 			
          
          	for(int i=0;i<req.length;i++){
              
@@ -223,6 +188,8 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
               }
            }
          	
+          dataView.append(str + "\r\n");
+         	
           str=str.substring(0,106)+fitemid+"F5";
          
           dataView.append(str + "\r\n");
@@ -244,7 +211,6 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
           //new Thread(work).start();
  		 } catch (Exception ex) {  
  			 ex.printStackTrace();
- 			 socketChannel = null;
  			 dataView.setText("服务器未开启" + "\r\n");
          }
 	 }

@@ -121,8 +121,9 @@ public class MainFrame extends JFrame {
     public String responstr="";
     public String datesend = "";
     public String msg;
+    public String fitemid;
     public NettyServerHandler NS = new NettyServerHandler();
-    public Client client = new Client(NS);
+    public Client client = new Client(NS,this);
     public TcpClientHandler TC = new TcpClientHandler();
     public HashMap<String, SocketChannel> socketlist = new HashMap<>();
     public int socketcount=0;
@@ -163,9 +164,44 @@ public class MainFrame extends JFrame {
 	public HashMap<String, Socket> clientList = new HashMap<>();
     public int clientcount=0;
     public boolean Firsttime=true;
-	protected String fitemid;
+	private String ip;
 	
 	public MainFrame() {
+		
+		try {
+			FileInputStream in = new FileInputStream("IPconfig.txt");  
+            InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+            BufferedReader bufReader = new BufferedReader(inReader);  
+            String line = null; 
+            int writetime=0;
+			
+		    while((line = bufReader.readLine()) != null){ 
+		    	if(writetime==0){
+	                ip=line;
+	                writetime++;
+		    	}
+		    	else{
+		    		fitemid=line;
+		    		writetime=0;
+		    	}
+            }  
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		   
+		if(fitemid.length()!=2){
+    		int count = 2-fitemid.length();
+    		for(int i=0;i<count;i++){
+    			fitemid="0"+fitemid;
+    		}
+    	}
+		
+		NS.fitemid = fitemid;
 		
 		new Thread(cli).start();
 		
@@ -413,7 +449,7 @@ public class MainFrame extends JFrame {
 	            
 	            //绑定端口，等待同步成功  
 	            ChannelFuture f;
-				f = b.bind(5550).sync();
+				f = b.bind(5555).sync();
 	            //等待服务端关闭监听端口  
 	            f.channel().closeFuture().sync(); 
 	        } catch (InterruptedException e) {

@@ -21,6 +21,7 @@ import io.netty.util.CharsetUtil;
 
 public class Client  
 {  
+  public MainFrame mainFrame;
   public NettyServerHandler NS;
   private EventLoopGroup loop = new NioEventLoopGroup();
   private String ip;
@@ -28,11 +29,12 @@ public class Client
   public Bootstrap bootstrap = new Bootstrap();
   public ConnectionListener CL = new ConnectionListener(this);
   
-  public Client(NettyServerHandler NS) {
+  public Client(NettyServerHandler NS, MainFrame mainFrame) {
 	// TODO Auto-generated constructor stub
-	  this.NS=NS;
+	  this.NS = NS;
+	  this.mainFrame = mainFrame;
   }
-  
+
   public Client() {
 	// TODO Auto-generated constructor stub
   }
@@ -86,7 +88,7 @@ public class Client
           CL.socketChannel = socketChannel;
         }  
       });  
-      bootstrap.remoteAddress(ip, 5555);
+      bootstrap.remoteAddress(ip, 5551);
       bootstrap.connect().addListener(CL); 
     }  
     return bootstrap;  
