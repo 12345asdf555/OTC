@@ -1,11 +1,13 @@
 package com.yang.serialport.ui;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -39,13 +41,34 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
              	Entry<String, SocketChannel> entry = (Entry<String, SocketChannel>) webiter.next();
              	socketfail = entry.getKey();
              	SocketChannel socketcon = entry.getValue();
-             	socketcon.writeAndFlush(Unpooled.copiedBuffer(str,CharsetUtil.UTF_8));
              	
-             	client.mainFrame.DateView(str);
+             	byte[] data=new byte[str.length()/2];
+		        for (int i1 = 0; i1 < data.length; i1++)
+		        {
+			          String tstr1=str.substring(i1*2, i1*2+2);
+			          Integer k=Integer.valueOf(tstr1,16);
+			          data[i1]=(byte)k.byteValue();
+		        }
+             	
+		        ByteBuf byteBuf = Unpooled.buffer();
+		        byteBuf.writeBytes(data);
+		        
+		        try{
+		        	
+		        	socketcon.writeAndFlush(byteBuf).sync();
+	             	client.mainFrame.DateView(str);
+	             	
+		        }catch (Exception e) {
+	         		client.mainFrame.socketlist.remove(socketfail);
+	         		webiter = client.mainFrame.socketlist.entrySet().iterator();
+					//webiter = socketlist.entrySet().iterator();
+				}
+             	
+             	//socketcon.writeAndFlush(Unpooled.copiedBuffer(str,CharsetUtil.UTF_8));
              	
          	}catch (Exception e) {
-					socketlist.remove(socketfail);
-					webiter = socketlist.entrySet().iterator();
+         		client.mainFrame.DateView("数据接收错误" + "\r\n");
+				//webiter = socketlist.entrySet().iterator();
 			}
          }
 	}
