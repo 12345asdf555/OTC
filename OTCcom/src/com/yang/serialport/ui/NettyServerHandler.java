@@ -50,7 +50,6 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 	private SocketChannel socketChannel = null;
 	public JTextArea dataView = new JTextArea();
 	public SocketChannel chcli = null;
-	public boolean First = true;
 	public Date timetran;
 	public long timetran1;
 	public Date time11;
@@ -211,68 +210,26 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
             }
             
             String electricity1 = strdata.substring(28,32);
-            int electricityint1 = Integer.valueOf(electricity1,16);
-            electricity1 = Integer.toHexString(electricityint1);
-            if(electricity1.length()!=4){
-            	int lenth = 4 - electricity1.length();
-            	for(int i=0;i<lenth;i++){
-            		electricity1 = "0" + electricity1;
-            	}
-            }
             
             String electricity2 = strdata.substring(78,82);
-            int electricityint2 = Integer.valueOf(electricity2,16);
-            electricity2 = Integer.toHexString(electricityint2);
-            if(electricity2.length()!=4){
-            	int lenth = 4 - electricity2.length();
-            	for(int i=0;i<lenth;i++){
-            		electricity2 = "0" + electricity2;
-            	}
-            }
             
             String electricity3 = strdata.substring(128,132);
-            int electricityint3 = Integer.valueOf(electricity3,16);
-            electricity3 = Integer.toHexString(electricityint3);
-            if(electricity3.length()!=4){
-            	int lenth = 4 - electricity3.length();
-            	for(int i=0;i<lenth;i++){
-            		electricity3 = "0" + electricity3;
-            	}
-            }
             
             String voltage1 = strdata.substring(32,36);
-            int voltageint1 = Integer.valueOf(voltage1,16);
-            voltage1 = Integer.toHexString(voltageint1);
-            if(voltage1.length()!=4){
-            	int lenth = 4 - voltage1.length();
-            	for(int i=0;i<lenth;i++){
-            		voltage1 = "0" + voltage1;
-            	}
-            }
             
             String voltage2 = strdata.substring(82,86);
-            int voltageint2 = Integer.valueOf(voltage2,16);
-            voltage2 = Integer.toHexString(voltageint2);
-            if(voltage2.length()!=4){
-            	int lenth = 4 - voltage2.length();
-            	for(int i=0;i<lenth;i++){
-            		voltage2 = "0" + voltage2;
-            	}
-            }
             
             String voltage3 = strdata.substring(132,136);
-            int voltageint3 = Integer.valueOf(voltage3,16);
-            voltage3 = Integer.toHexString(voltageint3);
-            if(voltage3.length()!=4){
-            	int lenth = 4 - voltage3.length();
-            	for(int i=0;i<lenth;i++){
-            		voltage3 = "0" + voltage3;
-            	}
-            }
             
-            String sensor = strdata.substring(48,52);
+            String code = strdata.substring(48,56);
             
-            if(First){
+            String status1 = strdata.substring(56,58);
+            
+            String status2 = strdata.substring(106,108);
+            
+            String status3 = strdata.substring(156,158);
+            
+            /*if(First){
             	timetran = new Date();
             	timetran1 = timetran.getTime();
                 time11 = new Date(timetran1);
@@ -290,7 +247,15 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
                 timetran3 = timetran2 + 1000;
                 time33 = new Date(timetran3);
                 timetran1 = timetran3;
-            }
+            }*/
+            
+            timetran = new Date();
+        	timetran1 = timetran.getTime();
+            time11 = new Date(timetran1);
+            timetran2 = timetran1 + 1000;
+            time22 = new Date(timetran2);
+            timetran3 = timetran2 + 1000;
+            time33 = new Date(timetran3);
             
             String time1 = DateTools.format("yyMMddHHmmss", time11);
             String time2 = DateTools.format("yyMMddHHmmss", time22);
@@ -407,7 +372,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
             	second163='0'+second163;
           	}
             
-            String status1 = "00";
+            /*String status1 = "00";
             String status2 = "00";
             String status3 = "00";
             if(electricityint1 != 0){
@@ -416,12 +381,12 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
             	status2 = "03";
             }else if(electricityint3 != 0){
             	status3 = "03";
-            }
+            }*/
             
-            String datesend = "00003101" + weld + welder + "00000001" 
-            + electricity1 + voltage1 + sensor + status1 + year161 + month161 + day161 + hour161 + minute161 + second161 
-            + electricity2 + voltage2 + sensor + status2 + year162 + month162 + day162 + hour162 + minute162 + second162
-            + electricity3 + voltage3 + sensor + status3 + year163 + month163 + day163 + hour163 + minute163 + second163;
+            String datesend = "00003101" + weld + welder + code 
+            + electricity1 + voltage1 + "0000" + status1 + year161 + month161 + day161 + hour161 + minute161 + second161 
+            + electricity2 + voltage2 + "0000" + status2 + year162 + month162 + day162 + hour162 + minute162 + second162
+            + electricity3 + voltage3 + "0000" + status3 + year163 + month163 + day163 + hour163 + minute163 + second163;
             
             int check = 0;
             byte[] data1=new byte[datesend.length()/2];
