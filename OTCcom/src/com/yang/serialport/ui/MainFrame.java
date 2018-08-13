@@ -26,6 +26,7 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
+import net.sf.json.JSONObject;
 
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
@@ -58,6 +59,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +74,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -83,7 +86,10 @@ import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import javax.xml.namespace.QName;
 
+import com.yang.serialport.ui.IsnullUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.sun.corba.se.pept.transport.Acceptor;
 import com.sun.corba.se.pept.transport.ListenerThread;
 import com.yang.serialport.exception.NoSuchPort;
@@ -99,7 +105,9 @@ import com.yang.serialport.manage.SerialPortManager;
 import com.yang.serialport.utils.ByteUtils;
 import com.yang.serialport.utils.ShowUtils;
 
+import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.sqlite.*;
+import org.apache.cxf.endpoint.Client;
 
 import com.yang.serialport.ui.*;
 
@@ -123,7 +131,7 @@ public class MainFrame extends JFrame {
     public String msg;
     public String fitemid;
     public NettyServerHandler NS = new NettyServerHandler();
-    public Client client = new Client(NS,this);
+    public Clientconnect clientconnect = new Clientconnect(NS,this);
     public TcpClientHandler TC = new TcpClientHandler();
     public HashMap<String, SocketChannel> socketlist = new HashMap<>();
     public int socketcount=0;
@@ -165,6 +173,11 @@ public class MainFrame extends JFrame {
     public int clientcount=0;
     public boolean Firsttime=true;
 	private String ip;
+	public ArrayList<String> listarrayJN = new ArrayList<String>();;
+	
+	private IsnullUtil iutil;
+	private JaxWsDynamicClientFactory dcf;
+	private Client client;
 	
 	public MainFrame() {
 		
@@ -204,13 +217,77 @@ public class MainFrame extends JFrame {
 		NS.fitemid = fitemid;
 		
 		new Thread(cli).start();
+		new Thread(ser).start();
 		
 		initView();
 		initComponents();
 		actionListener();
-		initData();	
+		initData();		
 	}
+	
+	
+	public Runnable ser =new Runnable(){
+		@Override
+		public void run() {
+			//任务webservice
+			try {
+				
+				try {
+					  FileInputStream in = new FileInputStream("IPconfig.txt");  
+			          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+			          BufferedReader bufReader = new BufferedReader(inReader);  
+			          String line = null; 
+			          int writetime=0;
+						
+					    while((line = bufReader.readLine()) != null){ 
+					    	if(writetime==0){
+				                ip=line;
+				                writetime++;
+					    	}
+			          }  
 
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				
+				iutil  =  new IsnullUtil();
+				dcf = JaxWsDynamicClientFactory.newInstance();
+				client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+				iutil.Authority(client);
+				
+				String obj1 = "{\"CLASSNAME\":\"junctionWebServiceImpl\",\"METHOD\":\"getWeldedJunctionAll\"}";
+				Object[] objects = client.invoke(new QName("http://webservice.ssmcxf.sshome.com/", "enterNoParamWs"),
+						new Object[] { obj1 });
+				String restr = objects[0].toString();
+		        JSONArray ary = JSONArray.parseArray(restr);
+		        for(int i=0;i<ary.size();i++){
+			        String str = ary.getString(i);
+			        JSONObject js = JSONObject.fromObject(str);
+			        
+			        if(js.getString("OPERATESTATUS").equals("0") || js.getString("OPERATESTATUS").equals("2")){
+			        	listarrayJN.add(js.getString("TASKNO"));
+			        	listarrayJN.add(js.getString("REWELDERNO"));
+			        	listarrayJN.add(js.getString("MACHINENO"));
+			        	listarrayJN.add(js.getString("OPERATESTATUS"));
+			        }
+			        
+		        }
+		        
+		        NS.listarrayJN = listarrayJN;
+		        
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				dataView.append("Webservice未开启" + "\r\n");
+				e.printStackTrace();
+			}		
+		}
+	};
+	
+	
 	public Runnable cli =new Runnable(){
 
 		private String ip;
@@ -220,7 +297,7 @@ public class MainFrame extends JFrame {
 			// TODO Auto-generated method stub
 			try{
 				
-				client.run();
+				clientconnect.run();
 				
 				/*try {
 					FileInputStream in = new FileInputStream("IPconfig.txt");  
@@ -424,6 +501,8 @@ public class MainFrame extends JFrame {
 
 	public Runnable work = new Runnable() {
 		
+		int count = 0;
+		
 		EventLoopGroup bossGroup = new NioEventLoopGroup(); 
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         
@@ -440,6 +519,13 @@ public class MainFrame extends JFrame {
 	            b = b.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 	                public void initChannel(SocketChannel chsoc) throws Exception {
+						
+						/*chsoc.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 1, 0, 0));    
+	                	chsoc.pipeline().addLast("frameEncoder", new LengthFieldPrepender(1));    
+	                	chsoc.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));    
+	                	chsoc.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));*/
+	                	count++;
+	                	
 	                   chsoc.pipeline().addLast(NS);
 	                   socketcount++;
 	                   socketlist.put(Integer.toString(socketcount),chsoc);

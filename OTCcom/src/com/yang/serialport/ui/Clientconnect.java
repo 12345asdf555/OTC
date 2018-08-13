@@ -19,7 +19,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
-public class Client  
+public class Clientconnect  
 {  
   public MainFrame mainFrame;
   public NettyServerHandler NS;
@@ -29,19 +29,19 @@ public class Client
   public Bootstrap bootstrap = new Bootstrap();
   public ConnectionListener CL = new ConnectionListener(this);
   
-  public Client(NettyServerHandler NS, MainFrame mainFrame) {
+  public Clientconnect(NettyServerHandler NS, MainFrame mainFrame) {
 	// TODO Auto-generated constructor stub
 	  this.NS = NS;
 	  this.mainFrame = mainFrame;
   }
 
-  public Client() {
+  public Clientconnect() {
 	// TODO Auto-generated constructor stub
   }
 
   public static void main( String[] args )  
   {  
-    new Client().run();  
+    new Clientconnect().run();  
   }  
   
   public Bootstrap createBootstrap(Bootstrap bootstrap, EventLoopGroup eventLoop) {  
@@ -88,7 +88,7 @@ public class Client
           CL.socketChannel = socketChannel;
         }  
       });  
-      bootstrap.remoteAddress(ip, 5551);
+      bootstrap.remoteAddress(ip, 5557);
       bootstrap.connect().addListener(CL); 
     }  
     return bootstrap;  
