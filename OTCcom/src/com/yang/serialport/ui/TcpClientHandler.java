@@ -37,7 +37,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		 String str = (String) msg;
 		 
-		 if(str.substring(0,2).equals("JN")){    //江南派工：任务号、焊工、焊机、状态
+		 if(str.substring(0,2).equals("JN")){    //江南派工：任务号id、焊工id、焊机id、状态、焊机编号
 			 
 			 listarrayJN = client.NS.listarrayJN;
 			 String[] JN = str.split(",");
@@ -48,7 +48,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 					 client.NS.listarrayJN  = listarrayJN;
 				 }
 			 }else if(JN[4].equals("1")){  //任务完成
-				 for(int i=0;i<listarrayJN.size();i+=4){
+				 for(int i=0;i<listarrayJN.size();i+=5){
 					 if(listarrayJN.get(i+1).equals(JN[2])){
 						 listarrayJN.set(i, "");
 						 listarrayJN.set(i+1, "");

@@ -68,6 +68,9 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
          workThread = new Thread(ws);  
          workThread.start(); */
          
+		 InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
+         String clientIP = insocket.getAddress().getHostAddress();
+		 
 		 ByteBuf buf=(ByteBuf)msg; 
 		 byte[] req=new byte[buf.readableBytes()];  
 	     buf.readBytes(req);
@@ -141,8 +144,8 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 				          
 					  }else if(str.substring(0,2).equals("FA")){
 						  
-						  str=str.substring(0,166)+fitemid+"F5";
-				          //dataView.append("实时:" + str + "\r\n");
+						  str=str.substring(0,106)+fitemid+"F5";
+				          dataView.append("实时:" + str + "\r\n");
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
@@ -195,7 +198,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
             String strdata4=strdata3.replaceAll("7C5C", "7C");
             String strdata =strdata4.replaceAll("7C5D", "7D");
             
-            String weld = strdata.substring(2,4);
+            String weld = Integer.toString(Integer.valueOf(strdata.substring(2,4), 16));
             if(weld.length()<4){
             	int length = 4 - weld.length();
             	for(int i=0;i<length;i++){
@@ -206,9 +209,17 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
             //江南任务下发
             String welder = "0000";
             String code = "00000000";
-            for(int i=0;i<listarrayJN.size();i+=4){
-            	if(weld.equals(listarrayJN.get(i+2))){
+            for(int i=0;i<listarrayJN.size();i+=5){
+            	if(weld.equals(listarrayJN.get(i+4))){
             		welder = listarrayJN.get(i+1);
+            		welder = Integer.toHexString(Integer.valueOf(welder));
+            		if(welder.length()<4){
+                    	int length = 4 - welder.length();
+                    	for(int j=0;j<length;j++){
+                    		welder = "0" + welder;
+                    	}
+                    }
+            		
             		code = listarrayJN.get(i);
             		code = Integer.toHexString(Integer.valueOf(code));
             		if(code.length()!=8){
@@ -218,6 +229,14 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
                     	}
             		}
             		code.toUpperCase();
+            	}
+            }
+            
+            weld = Integer.toHexString(Integer.valueOf(weld));
+            if(weld.length()<4){
+            	int length = 4 - weld.length();
+            	for(int i=0;i<length;i++){
+            		weld = "0" + weld;
             	}
             }
             

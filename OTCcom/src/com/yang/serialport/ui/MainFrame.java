@@ -100,7 +100,6 @@ import com.yang.serialport.exception.SendDataToSerialPortFailure;
 import com.yang.serialport.exception.SerialPortInputStreamCloseFailure;
 import com.yang.serialport.exception.SerialPortOutputStreamCloseFailure;
 import com.yang.serialport.exception.SerialPortParameterFailure;
-import com.yang.serialport.exception.TooManyListeners;
 import com.yang.serialport.manage.SerialPortManager;
 import com.yang.serialport.utils.ByteUtils;
 import com.yang.serialport.utils.ShowUtils;
@@ -269,10 +268,14 @@ public class MainFrame extends JFrame {
 			        JSONObject js = JSONObject.fromObject(str);
 			        
 			        if(js.getString("OPERATESTATUS").equals("0") || js.getString("OPERATESTATUS").equals("2")){
-			        	listarrayJN.add(js.getString("TASKNO"));
+			        	/*listarrayJN.add(js.getString("TASKNO"));
 			        	listarrayJN.add(js.getString("REWELDERNO"));
-			        	listarrayJN.add(js.getString("MACHINENO"));
+			        	listarrayJN.add(js.getString("MACHINENO"));*/
+			        	listarrayJN.add(js.getString("ID"));
+			        	listarrayJN.add(js.getString("REWELDERID"));
+			        	listarrayJN.add(js.getString("MACHINEID"));
 			        	listarrayJN.add(js.getString("OPERATESTATUS"));
+			        	listarrayJN.add(js.getString("MACHINENO"));
 			        }
 			        
 		        }
