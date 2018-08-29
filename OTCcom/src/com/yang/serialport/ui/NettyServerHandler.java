@@ -128,16 +128,18 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 					  
 					  if(str.substring(0,2).equals("7E") && (str.substring(4,6).equals("22") || (str.substring(4,6).equals("20") && str.substring(6,8).equals("22")))){
 						  
-						  str = transOTC(str);
-						  //str = transJN(str);
+						  //str = transOTC(str);
+						  str = transJN(str);
 						  str=str.substring(0,106)+fitemid+"F5";
-				          dataView.append("OTC:" + str + "\r\n");
+				          //dataView.append("OTC:" + str + "\r\n");
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
+							 System.out.println("OTC:" + str);
 				          }catch(Exception ex){
 							 ex.printStackTrace();
-				 			 dataView.setText("服务器未开启" + "\r\n");
+				 			 //dataView.setText("服务器未开启" + "\r\n");
+				 			 System.out.println("服务器未开启");
 				          }
 				          
 				          str = "";
@@ -145,26 +147,30 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 					  }else if(str.substring(0,2).equals("FA")){
 						  
 						  str=str.substring(0,106)+fitemid+"F5";
-				          dataView.append("实时:" + str + "\r\n");
+				          //dataView.append("实时:" + str + "\r\n");
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
+					         System.out.println("实时:" + str);
 				          }catch(Exception ex){
 							 ex.printStackTrace();
-				 			 dataView.setText("服务器未开启" + "\r\n");
+				 			 //dataView.setText("服务器未开启" + "\r\n");
+				 			 System.out.println("服务器未开启");
 				          }
 				          
 				          str = "";
 						  
 					  }else{
 						  
-						  dataView.append("上行:" + str + "\r\n");
+						  //dataView.append("上行:" + str + "\r\n");
 						  
 						  try{
 		        	  		 chcli.writeAndFlush(str).sync();
+							 System.out.println("上行:" + str);
 				          }catch(Exception ex){
 							 ex.printStackTrace();
-				 			 dataView.setText("服务器未开启" + "\r\n");
+				 			 //dataView.setText("服务器未开启" + "\r\n");
+							 System.out.println("服务器未开启");
 				          }
 						  
 						  str = "";

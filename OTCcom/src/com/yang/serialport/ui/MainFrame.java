@@ -214,14 +214,15 @@ public class MainFrame extends JFrame {
     	}
 		
 		NS.fitemid = fitemid;
-		
+
+		new Thread(ser).start();
 		new Thread(cli).start();
-		//new Thread(ser).start();
+		new Thread(work).start();
 		
-		initView();
+		/*initView();
 		initComponents();
 		actionListener();
-		initData();		
+		initData();*/		
 	}
 	
 	
@@ -245,13 +246,13 @@ public class MainFrame extends JFrame {
 					    	}
 			          }  
 
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 				iutil  =  new IsnullUtil();
 				dcf = JaxWsDynamicClientFactory.newInstance();
@@ -284,7 +285,8 @@ public class MainFrame extends JFrame {
 		        
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				dataView.append("Webservice未开启" + "\r\n");
+				//dataView.append("Webservice未开启" + "\r\n");
+				System.out.println("Webservice未开启");
 				e.printStackTrace();
 			}		
 		}
@@ -555,7 +557,7 @@ public class MainFrame extends JFrame {
 	public static void main(String args[]) {
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				new MainFrame().setVisible(true);
+				new MainFrame();
 			}
 		});
 	}
