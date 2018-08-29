@@ -216,7 +216,7 @@ public class MainFrame extends JFrame {
 		NS.fitemid = fitemid;
 		
 		new Thread(cli).start();
-		new Thread(ser).start();
+		//new Thread(ser).start();
 		
 		initView();
 		initComponents();
