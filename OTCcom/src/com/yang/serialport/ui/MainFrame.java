@@ -215,13 +215,14 @@ public class MainFrame extends JFrame {
 		
 		NS.fitemid = fitemid;
 		
+		new Thread(work).start();
 		new Thread(cli).start();
 		//new Thread(ser).start();
 		
-		initView();
+		/*initView();
 		initComponents();
 		actionListener();
-		initData();		
+		initData();	*/	
 	}
 	
 	
@@ -284,7 +285,8 @@ public class MainFrame extends JFrame {
 		        
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				dataView.append("Webservice未开启" + "\r\n");
+				//dataView.append("Webservice未开启" + "\r\n");
+				System.out.println("Webservice未开启");
 				e.printStackTrace();
 			}		
 		}
@@ -555,7 +557,7 @@ public class MainFrame extends JFrame {
 	public static void main(String args[]) {
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				new MainFrame().setVisible(true);
+				new MainFrame();
 			}
 		});
 	}
