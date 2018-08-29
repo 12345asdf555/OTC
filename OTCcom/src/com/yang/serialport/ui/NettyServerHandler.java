@@ -132,12 +132,12 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 						  //str = transJN(str);
 						  str=str.substring(0,106)+fitemid+"F5";
 				          //dataView.append("OTC:" + str + "\r\n");
-						  System.out.println("OTC:" + str);
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
+							 System.out.println("OTC:" + str);
 				          }catch(Exception ex){
-							 ex.printStackTrace();
+							 //ex.printStackTrace();
 				 			 //dataView.setText("服务器未开启" + "\r\n");
 				 			 System.out.println("服务器未开启");
 				          }
@@ -148,12 +148,12 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 						  
 						  str=str.substring(0,106)+fitemid+"F5";
 				          //dataView.append("实时:" + str + "\r\n");
-				          System.out.println("实时:" + str);
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
+					         System.out.println("实时:" + str);
 				          }catch(Exception ex){
-							 ex.printStackTrace();
+							 //ex.printStackTrace();
 				 			 //dataView.setText("服务器未开启" + "\r\n");
 				 			 System.out.println("服务器未开启");
 				          }
@@ -163,12 +163,12 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 					  }else{
 						  
 						  //dataView.append("上行:" + str + "\r\n");
-						  System.out.println("上行:" + str);
 						  
 						  try{
 		        	  		 chcli.writeAndFlush(str).sync();
+							 System.out.println("上行:" + str);
 				          }catch(Exception ex){
-							 ex.printStackTrace();
+							 //ex.printStackTrace();
 				 			 //dataView.setText("服务器未开启" + "\r\n");
 							 System.out.println("服务器未开启");
 				          }
