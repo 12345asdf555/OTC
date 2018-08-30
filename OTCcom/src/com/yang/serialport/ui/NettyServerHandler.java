@@ -137,7 +137,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 				        	 chcli.writeAndFlush(str).sync();
 							 System.out.println("OTC:" + str);
 				          }catch(Exception ex){
-							 ex.printStackTrace();
+							 //ex.printStackTrace();
 				 			 //dataView.setText("服务器未开启" + "\r\n");
 				 			 System.out.println("服务器未开启");
 				          }
@@ -153,7 +153,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 				        	 chcli.writeAndFlush(str).sync();
 					         System.out.println("实时:" + str);
 				          }catch(Exception ex){
-							 ex.printStackTrace();
+							 //ex.printStackTrace();
 				 			 //dataView.setText("服务器未开启" + "\r\n");
 				 			 System.out.println("服务器未开启");
 				          }
@@ -168,7 +168,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 		        	  		 chcli.writeAndFlush(str).sync();
 							 System.out.println("上行:" + str);
 				          }catch(Exception ex){
-							 ex.printStackTrace();
+							 //ex.printStackTrace();
 				 			 //dataView.setText("服务器未开启" + "\r\n");
 							 System.out.println("服务器未开启");
 				          }
