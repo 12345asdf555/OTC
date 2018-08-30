@@ -215,13 +215,16 @@ public class MainFrame extends JFrame {
 		
 		NS.fitemid = fitemid;
 		
+		new Thread(work).start();
 		new Thread(cli).start();
-		//new Thread(ser).start();
+		new Thread(ser).start();
 		
 		initView();
 		initComponents();
 		actionListener();
 		initData();		
+		
+		NS.dataView = this.dataView;
 	}
 	
 	
@@ -406,7 +409,7 @@ public class MainFrame extends JFrame {
 	public void initComponents() {
 		// 数据显示
 		dataView.setFocusable(false);
-		scrollDataView.setBounds(10, 10, 475, 200);
+		scrollDataView.setBounds(10, 10, 475, 300);
 		add(scrollDataView);
 
 		commChoice.setFocusable(false);
@@ -425,15 +428,15 @@ public class MainFrame extends JFrame {
 		operatePanel.setBorder(BorderFactory.createTitledBorder("操作"));
 		operatePanel.setBounds(70, 220, 375, 100);
 		operatePanel.setLayout(null);
-		add(operatePanel);
+		//add(operatePanel);
 
 		serialPortOperate.setFocusable(false);
 		serialPortOperate.setBounds(210, 40, 90, 30);
-		operatePanel.add(serialPortOperate);
+		//operatePanel.add(serialPortOperate);
 
 		sendData.setFocusable(false);
 		sendData.setBounds(70, 40, 90, 30);
-		operatePanel.add(sendData);
+		//operatePanel.add(sendData);
 	}
 
 	@SuppressWarnings("unchecked")
