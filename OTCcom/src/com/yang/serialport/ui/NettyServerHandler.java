@@ -128,13 +128,13 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 					  
 					  if(str.substring(0,2).equals("7E") && (str.substring(4,6).equals("22") || (str.substring(4,6).equals("20") && str.substring(6,8).equals("22")))){
 						  
-						  str = transOTC(str);
-						  //str = transJN(str);
+						  //str = transOTC(str);
+						  str = transJN(str);
 						  str=str.substring(0,106)+fitemid+"F5";
-				          dataView.append("OTC:" + str + "\r\n");
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
+					         dataView.append("OTC:" + str + "\r\n");
 				          }catch(Exception ex){
 							 ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");
@@ -145,10 +145,10 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 					  }else if(str.substring(0,2).equals("FA")){
 						  
 						  str=str.substring(0,106)+fitemid+"F5";
-				          dataView.append("实时:" + str + "\r\n");
 				          
 				          try{
-				        	 chcli.writeAndFlush(str).sync();
+				        	  chcli.writeAndFlush(str).sync();
+					          dataView.append("实时:" + str + "\r\n");
 				          }catch(Exception ex){
 							 ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");
@@ -158,10 +158,10 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 						  
 					  }else{
 						  
-						  dataView.append("上行:" + str + "\r\n");
 						  
 						  try{
-		        	  		 chcli.writeAndFlush(str).sync();
+		        	  		  chcli.writeAndFlush(str).sync();
+							  dataView.append("上行:" + str + "\r\n");
 				          }catch(Exception ex){
 							 ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");
@@ -212,23 +212,31 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
             for(int i=0;i<listarrayJN.size();i+=5){
             	if(weld.equals(listarrayJN.get(i+4))){
             		welder = listarrayJN.get(i+1);
-            		welder = Integer.toHexString(Integer.valueOf(welder));
-            		if(welder.length()<4){
-                    	int length = 4 - welder.length();
-                    	for(int j=0;j<length;j++){
-                    		welder = "0" + welder;
-                    	}
-                    }
+            		if(welder!=""){
+            			welder = Integer.toHexString(Integer.valueOf(welder));
+                		if(welder.length()<4){
+                        	int length = 4 - welder.length();
+                        	for(int j=0;j<length;j++){
+                        		welder = "0" + welder;
+                        	}
+                        }
+            		}else{
+            			welder = "0000";
+            		}
             		
             		code = listarrayJN.get(i);
-            		code = Integer.toHexString(Integer.valueOf(code));
-            		if(code.length()!=8){
-            			int length = 8 - code.length();
-            			for(int i1=0;i1<length;i1++){
-            				code = "0" + code;
-                    	}
+            		if(code!=""){
+            			code = Integer.toHexString(Integer.valueOf(code));
+                		if(code.length()!=8){
+                			int length = 8 - code.length();
+                			for(int i1=0;i1<length;i1++){
+                				code = "0" + code;
+                        	}
+                		}
+                		code.toUpperCase();
+            		}else{
+            			code = "00000000";
             		}
-            		code.toUpperCase();
             	}
             }
             
