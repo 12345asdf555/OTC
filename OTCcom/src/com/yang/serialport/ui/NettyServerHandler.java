@@ -21,6 +21,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -37,7 +38,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler.Sharable;
 @Sharable 
-public class NettyServerHandler extends ChannelHandlerAdapter{
+public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	
 	public String ip;
     public String connet;
@@ -59,17 +60,13 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 	public long timetran3;
 	public Date time33;
 	
-	 @Override  
-	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+	 public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		 
 		 /*String str = (String) msg;
 		 byte[] a = str.getBytes();
 		 Workspace ws = new Workspace(str);
          workThread = new Thread(ws);  
          workThread.start(); */
-         
-		 InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
-         String clientIP = insocket.getAddress().getHostAddress();
 		 
 		 ByteBuf buf=(ByteBuf)msg; 
 		 byte[] req=new byte[buf.readableBytes()];  
@@ -198,13 +195,17 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
             String strdata4=strdata3.replaceAll("7C5C", "7C");
             String strdata =strdata4.replaceAll("7C5D", "7D");
             
-            String weld = Integer.toString(Integer.valueOf(strdata.substring(2,4), 16));
+            //String weld = Integer.toString(Integer.valueOf(strdata.substring(2,4), 16));
+            String weld1 = strdata.substring(6,8);
+            String weld2 = strdata.substring(2,4);
+            String weld = weld1 + weld2;
+            /*String weld = Integer.toString(Integer.valueOf(weld1+weld2, 16));
             if(weld.length()<4){
             	int length = 4 - weld.length();
             	for(int i=0;i<length;i++){
             		weld = "0" + weld;
             	}
-            }
+            }*/
             
             //江南任务下发
             String welder = "0000";
@@ -240,13 +241,13 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
             	}
             }
             
-            weld = Integer.toHexString(Integer.valueOf(weld));
+            /*weld = Integer.toHexString(Integer.valueOf(weld));
             if(weld.length()<4){
             	int length = 4 - weld.length();
             	for(int i=0;i<length;i++){
             		weld = "0" + weld;
             	}
-            }
+            }*/
             
             /*String welder1 = Integer.valueOf(strdata.substring(20,22),16).toString(); 
             String welder2 = Integer.valueOf(strdata.substring(22,24),16).toString();
@@ -702,9 +703,8 @@ public class NettyServerHandler extends ChannelHandlerAdapter{
 	 
 	 
 	 
-	 @Override  
-	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {  
-		 super.channelReadComplete(ctx);  
+	 public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {  
+		 //super.channelReadComplete(ctx);  
 	     ctx.flush();  
 	 } 
      @Override  

@@ -132,7 +132,7 @@ public class MainFrame extends JFrame {
     public NettyServerHandler NS = new NettyServerHandler();
     public Clientconnect clientconnect = new Clientconnect(NS,this);
     public TcpClientHandler TC = new TcpClientHandler();
-    public HashMap<String, SocketChannel> socketlist = new HashMap<>();
+    public HashMap<String, SocketChannel> socketlist = new HashMap();
     public int socketcount=0;
 
 	/**
@@ -168,7 +168,7 @@ public class MainFrame extends JFrame {
 	private List<String> commList = null;
 	private SerialPort serialport;
 	private SocketChannel socketChannel = null;
-	public HashMap<String, Socket> clientList = new HashMap<>();
+	public HashMap<String, Socket> clientList = new HashMap();
     public int clientcount=0;
     public boolean Firsttime=true;
 	private String ip;
@@ -537,7 +537,8 @@ public class MainFrame extends JFrame {
 	                   socketlist.put(Integer.toString(socketcount),chsoc);
 	                   TC.socketlist = socketlist;
 	                }
-	            });
+	            }).option(ChannelOption.SO_BACKLOG, 128)
+	            .childOption(ChannelOption.SO_KEEPALIVE, true);
 	            
 	            //绑定端口，等待同步成功  
 	            ChannelFuture f;

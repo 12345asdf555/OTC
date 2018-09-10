@@ -33,7 +33,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 		
 	}
 	
-	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		 String str = (String) msg;
 		 
@@ -127,14 +126,12 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 		 }
 	}
 	
-	@Override  
 	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {  
-		 super.channelReadComplete(ctx);  
+		 //super.channelReadComplete(ctx);  
 	     ctx.flush();  
 	 } 
 	
-	@Override  
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {  
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception {  
 	
       final EventLoop eventLoop = ctx.channel().eventLoop();  
       eventLoop.schedule(new Runnable() {  
@@ -143,7 +140,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
     		client.createBootstrap(new Bootstrap(),eventLoop);
         }  
       }, 1L, TimeUnit.SECONDS);  
-      super.channelInactive(ctx);  
+      //super.channelInactive(ctx);  
     }  
 	
     @Override  
