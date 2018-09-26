@@ -125,8 +125,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					  
 					  if(str.substring(0,2).equals("7E") && (str.substring(4,6).equals("22") || (str.substring(4,6).equals("20") && str.substring(6,8).equals("22")))){
 						  
-						  //str = transOTC(str);
-						  str = transJN(str);
+						  str = transOTC(str);
+						  //str = transJN(str);
 						  str=str.substring(0,106)+fitemid+"F5";
 				          
 				          try{
@@ -474,7 +474,9 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
             String strdata4=strdata3.replaceAll("7C5C", "7C");
             String strdata =strdata4.replaceAll("7C5D", "7D");
             
-            String weld = strdata.substring(2,4);
+            String weld1 = strdata.substring(6,8);
+            String weld2 = strdata.substring(2,4);
+            String weld = weld1 + weld2;
             if(weld.length()<4){
             	int length = 4 - weld.length();
             	for(int i=0;i<length;i++){

@@ -48,35 +48,64 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 				 }
 			 }else if(JN[4].equals("1")){  //任务完成
 				 for(int i=0;i<listarrayJN.size();i+=5){
-					 if(listarrayJN.get(i+1).equals(JN[2])){
+					 if(listarrayJN.get(i).equals(JN[1])){
+						 
+						 String weld = listarrayJN.get(i+2);
+						 
 						 listarrayJN.set(i, "");
 						 listarrayJN.set(i+1, "");
 						 listarrayJN.set(i+2, "");
 						 listarrayJN.set(i+3, "");
+						 listarrayJN.set(i+4, "");
+						 
+						 for(int j=0;j<listarrayJN.size();j+=5){
+							 if(listarrayJN.get(i+2).equals(weld)){
+								 listarrayJN.set(i, "");
+								 listarrayJN.set(i+1, "");
+								 listarrayJN.set(i+2, "");
+								 listarrayJN.set(i+3, "");
+								 listarrayJN.set(i+4, "");
+							 }
+						 }
+						 
 						 client.NS.listarrayJN  = listarrayJN;
-						 break;
+						 
 					 }
 				 }
 			 }else if(JN[4].equals("2")){  //任务修改
-				 for(int i=0;i<listarrayJN.size();i+=4){
-					 if(listarrayJN.get(i+1).equals(JN[2])){
+				 for(int i=0;i<listarrayJN.size();i+=5){
+					 if(listarrayJN.get(i).equals(JN[1])){
 						 listarrayJN.set(i, JN[1]);
 						 listarrayJN.set(i+1, JN[2]);
 						 listarrayJN.set(i+2, JN[3]);
 						 listarrayJN.set(i+3, JN[4]);
+						 listarrayJN.set(i+4, JN[5]);
 						 client.NS.listarrayJN  = listarrayJN;
-						 break;
 					 }
 				 }
 			 }else if(JN[4].equals("3")){  //任务取消
-				 for(int i=0;i<listarrayJN.size();i+=4){
-					 if(listarrayJN.get(i+1).equals(JN[2])){
+				 for(int i=0;i<listarrayJN.size();i+=5){
+					 if(listarrayJN.get(i).equals(JN[1])){
+						 
+						 String weld = listarrayJN.get(i+2);
+						 
 						 listarrayJN.set(i, "");
 						 listarrayJN.set(i+1, "");
 						 listarrayJN.set(i+2, "");
 						 listarrayJN.set(i+3, "");
+						 listarrayJN.set(i+4, "");
+						 
+						 for(int j=0;j<listarrayJN.size();j+=5){
+							 if(listarrayJN.get(i+2).equals(weld)){
+								 listarrayJN.set(i, "");
+								 listarrayJN.set(i+1, "");
+								 listarrayJN.set(i+2, "");
+								 listarrayJN.set(i+3, "");
+								 listarrayJN.set(i+4, "");
+							 }
+						 }
+						 
 						 client.NS.listarrayJN  = listarrayJN;
-						 break;
 					 }
 				 }
 			 }

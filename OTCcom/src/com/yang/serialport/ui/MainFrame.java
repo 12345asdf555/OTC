@@ -217,7 +217,7 @@ public class MainFrame extends JFrame {
 		
 		new Thread(work).start();
 		new Thread(cli).start();
-		new Thread(ser).start();
+		//new Thread(ser).start();
 		
 		initView();
 		initComponents();
@@ -258,6 +258,7 @@ public class MainFrame extends JFrame {
 				
 				iutil  =  new IsnullUtil();
 				dcf = JaxWsDynamicClientFactory.newInstance();
+				//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
 				client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
 				iutil.Authority(client);
 				
@@ -266,20 +267,43 @@ public class MainFrame extends JFrame {
 						new Object[] { obj1 });
 				String restr = objects[0].toString();
 		        JSONArray ary = JSONArray.parseArray(restr);
+		        
+		        ArrayList<String> listarraybuf = new ArrayList<String>();
+		        
 		        for(int i=0;i<ary.size();i++){
 			        String str = ary.getString(i);
 			        JSONObject js = JSONObject.fromObject(str);
 			        
-			        if(js.getString("OPERATESTATUS").equals("0") || js.getString("OPERATESTATUS").equals("2")){
-			        	/*listarrayJN.add(js.getString("TASKNO"));
-			        	listarrayJN.add(js.getString("REWELDERNO"));
-			        	listarrayJN.add(js.getString("MACHINENO"));*/
+			        if(js.getString("OPERATESTATUS").equals("1")){
+		        		listarraybuf.add(js.getString("ID"));
+		        	}else{
+		        		
+		        		int count1=0;
+		        		for(int l=0;l<listarraybuf.size();l++){
+		        			if(listarraybuf.get(l).equals(js.getString("ID"))){
+		        				break;
+		        			}else{
+		        				count1++;
+		        				if(count1==listarraybuf.size()){
+			        				if(js.getString("OPERATESTATUS").equals("0") || js.getString("OPERATESTATUS").equals("2")){
+			    			        	listarrayJN.add(js.getString("ID"));
+			    			        	listarrayJN.add(js.getString("REWELDERID"));
+			    			        	listarrayJN.add(js.getString("MACHINEID"));
+			    			        	listarrayJN.add(js.getString("OPERATESTATUS"));
+			    			        	listarrayJN.add(js.getString("MACHINENO"));
+			    			        }
+		        				}
+		        			}
+		        		}
+		        	}
+			        
+			        /*if(js.getString("OPERATESTATUS").equals("0") || js.getString("OPERATESTATUS").equals("2")){
 			        	listarrayJN.add(js.getString("ID"));
 			        	listarrayJN.add(js.getString("REWELDERID"));
 			        	listarrayJN.add(js.getString("MACHINEID"));
 			        	listarrayJN.add(js.getString("OPERATESTATUS"));
 			        	listarrayJN.add(js.getString("MACHINENO"));
-			        }
+			        }*/
 			        
 		        }
 		        
