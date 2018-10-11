@@ -10,6 +10,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
+//netty连接服务器,若断开自动检测重连
 public class ConnectionListener implements ChannelFutureListener {
 	public Clientconnect client;  
 	public SocketChannel socketChannel;
@@ -28,6 +29,7 @@ public class ConnectionListener implements ChannelFutureListener {
 		      loop.schedule(new Runnable() {  
 			        @Override  
 			        public void run() {  
+			          //开始连接
 			          client.createBootstrap(new Bootstrap(), loop);  
 			        }  
 			  }, 1L, TimeUnit.SECONDS);  

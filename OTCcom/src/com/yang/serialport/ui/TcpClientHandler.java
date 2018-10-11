@@ -20,6 +20,7 @@ import io.netty.util.CharsetUtil;
 public class TcpClientHandler extends ChannelHandlerAdapter {
 	
 	public Clientconnect client;
+	public MainFrame mainframe;
 	public HashMap<String, SocketChannel> socketlist;
 	public String socketfail;
 	public ArrayList<String> listarrayJN = new ArrayList<String>();
@@ -37,7 +38,8 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 		 String str = (String) msg;
 		 
 		 if(str.substring(0,2).equals("JN")){    //江南派工：任务号id、焊工id、焊机id、状态、焊机编号
-			 
+
+			 synchronized (listarrayJN) {
 			 listarrayJN = client.NS.listarrayJN;
 			 String[] JN = str.split(",");
 			 
@@ -111,9 +113,13 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			 }
 			 
 			 System.out.println(str);
-			 
+			 }
 		 }else{    //处理下发和上传
-			 
+			 synchronized (client.mainFrame.socketlist) {
+				 
+			 ArrayList<String> listarraybuf = new ArrayList<String>();
+        	 boolean ifdo= false;
+				 
 			 Iterator<Entry<String, SocketChannel>> webiter = client.mainFrame.socketlist.entrySet().iterator();
 	         while(webiter.hasNext()){
 	         	try{
@@ -125,9 +131,9 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 	             	byte[] data=new byte[str.length()/2];
 			        for (int i1 = 0; i1 < data.length; i1++)
 			        {
-				          String tstr1=str.substring(i1*2, i1*2+2);
-				          Integer k=Integer.valueOf(tstr1,16);
-				          data[i1]=(byte)k.byteValue();
+				        String tstr1=str.substring(i1*2, i1*2+2);
+				        Integer k=Integer.valueOf(tstr1,16);
+				        data[i1]=(byte)k.byteValue();
 			        }
 	             	
 			        ByteBuf byteBuf = Unpooled.buffer();
@@ -136,15 +142,11 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			        try{
 			        	
 			        	socketcon.writeAndFlush(byteBuf).sync();
-		             	client.mainFrame.DateView(str);
 		             	
 			        }catch (Exception e) {
-		         		client.mainFrame.socketlist.remove(socketfail);
-		         		webiter = client.mainFrame.socketlist.entrySet().iterator();
-						//webiter = socketlist.entrySet().iterator();
+			        	listarraybuf.add(socketfail);
+ 	                    ifdo = true;
 					}
-	             	
-	             	//socketcon.writeAndFlush(Unpooled.copiedBuffer(str,CharsetUtil.UTF_8));
 	             	
 	         	}catch (Exception e) {
 	         		client.mainFrame.DateView("数据接收错误" + "\r\n");
@@ -152,6 +154,15 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 				}
 	         }
 	         
+          	 client.mainFrame.DateView(str);
+	         
+	         if(ifdo){
+	        	 for(int i=0;i<listarraybuf.size();i++){
+	        		 client.mainFrame.socketlist.remove(listarraybuf.get(i));
+            	 }
+             }
+	         
+			 }
 		 }
 	}
 	

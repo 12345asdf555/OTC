@@ -30,7 +30,6 @@ import java.util.Locale;
 
 import javax.websocket.Session;
 
-import javafx.scene.chart.PieChart.Data;
 
 
 public class Server implements Runnable {  
@@ -635,8 +634,6 @@ public class Server implements Runnable {
 	                    md.update(key.getBytes("utf-8"), 0, key.length());  
 	                    byte[] sha1Hash = md.digest();    
 	                    //进行Base64加密  
-	                    sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();    
-	                    key = encoder.encode(sha1Hash); 
 	                    pw.println("HTTP/1.1 101 Switching Protocols");  
 	                    pw.println("Upgrade: websocket");  
 	                    pw.println("Connection: Upgrade");  

@@ -37,6 +37,8 @@ import io.netty.util.CharsetUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler.Sharable;
+
+//接收焊机数据处理
 @Sharable 
 public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	
@@ -45,11 +47,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
     public String fitemid;
     public Thread workThread;
     public HashMap<String, Socket> websocket;
-    public ArrayList<String> listarray1 = new ArrayList<String>();
-    public ArrayList<String> listarray2 = new ArrayList<String>();
-    public ArrayList<String> listarray3 = new ArrayList<String>();
+    public ArrayList<String> listjunction = new ArrayList<String>();
+    public ArrayList<String> listwelder = new ArrayList<String>();
+    public ArrayList<String> listweld = new ArrayList<String>();
     public ArrayList<String> listarrayJN = new ArrayList<String>();  //任务、焊工、焊机、状态
-	private SocketChannel socketChannel = null;
 	public JTextArea dataView = new JTextArea();
 	public SocketChannel chcli = null;
 	public Date timetran;
@@ -62,25 +63,12 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	
 	 public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		 
-		 /*String str = (String) msg;
-		 byte[] a = str.getBytes();
-		 Workspace ws = new Workspace(str);
-         workThread = new Thread(ws);  
-         workThread.start(); */
-		 
 		 ByteBuf buf=(ByteBuf)msg; 
 		 byte[] req=new byte[buf.readableBytes()];  
 	     buf.readBytes(req);
 	     Workspace ws = new Workspace(req);
          workThread = new Thread(ws);  
          workThread.start();
-         
-		 /*String str = (String) msg;
-		 byte[] req=str.getBytes();
-         Workspace ws = new Workspace(req);
-         workThread = new Thread(ws);  
-         workThread.start();*/
-		 
 	}
  		 
 	 
@@ -123,11 +111,12 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				
 				  if(str.length()>=6){
 					  
-					  if(str.substring(0,2).equals("7E") && (str.substring(4,6).equals("22") || (str.substring(4,6).equals("20") && str.substring(6,8).equals("22")))){
+					  if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22")) && str.length()==234){
 						  
-						  str = transOTC(str);
+						  str = trans(str);
+						  //str = transOTC(str);
 						  //str = transJN(str);
-						  str=str.substring(0,106)+fitemid+"F5";
+						  str=str.substring(0,232)+fitemid+"7D";
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
@@ -155,7 +144,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 						  
 					  }else{
 						  
-						  
 						  try{
 		        	  		  chcli.writeAndFlush(str).sync();
 							  dataView.append("上行:" + str + "\r\n");
@@ -168,23 +156,185 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 						  
 					  }
 				  }
-				
-		          /*byte[] data=new byte[str.length()/2];
-		          for (int i1 = 0; i1 < data.length; i1++)
-		          {
-			            String tstr1=str.substring(i1*2, i1*2+2);
-			            Integer k=Integer.valueOf(tstr1, 16);
-			            data[i1]=(byte)k.byteValue();
-		          }*/
-		         
-		          //socketChannel.write(ByteBuffer.wrap(data));
-		          //System.out.println(str);
-		          
-		          //new Thread(work).start();
 			}catch(Exception ex){
 				 ex.printStackTrace();
 	 			 //dataView.append("数据接收错误" + "\r\n");
 			}
+		}
+		
+		private String trans(String str) {
+			// TODO Auto-generated method stub
+			
+			if (str.length() == 234) {
+				
+				//校验第一位是否为FA末位是否为F5
+	      	    String check1 =str.substring(0,2);
+	      	    String check11=str.substring(232,234);
+	      	    if(check1.equals("7E") && check11.equals("7D")){
+
+	      	    	//校验位校验
+	          	    String check3=str.substring(0,230);
+	          	    String check5="";
+	          	    int check4=0;
+	          	    for (int i11 = 0; i11 < check3.length()/2; i11++)
+	          	    {
+		          	    String tstr1=check3.substring(i11*2, i11*2+2);
+		          	    check4+=Integer.valueOf(tstr1,16);
+	          	    }
+	          	    if((Integer.toHexString(check4)).toUpperCase().length()==3){
+	          	    	check5 = ((Integer.toHexString(check4)).toUpperCase()).substring(1,3);
+	          	    }else{
+	          	    	check5 = ((Integer.toHexString(check4)).toUpperCase()).substring(2,4);
+	          	    }
+	          	    String check6 = str.substring(230,232);
+	          	    if(check5.equals(check6)){
+	          	    	
+	          	    	StringBuilder sb = new StringBuilder(str);
+	        			
+	        			String weld = str.substring(14, 18);
+	        			String welder = str.substring(34, 38);
+	        			String junction1 = str.substring(70, 78);
+	        			String junction2 = str.substring(134, 142);
+	        			String junction3 = str.substring(198, 206);
+	        			
+	        			int countweld = 0;
+	        			int countwelder = 0;
+	        			int countjunction = 0;
+	        			
+	        			//焊机编号对应id
+	        			for(int a=0;a<listweld.size();a+=4){
+	        				if(Integer.valueOf(listweld.get(a+1)) == (Integer.parseInt(weld,16))){
+	        					String junctionid = listweld.get(a);
+	        					String weldid = listweld.get(a+2);
+	        					
+	        					if(junctionid.length() != 4){
+	        						int length = 4 - junctionid.length();
+	        						for(int b=0;b<length;b++){
+	        							junctionid = "0" + junctionid;
+	        						}
+	        					}
+	        					
+	        					if(weldid.length() != 4){
+	        						int length = 4 - weldid.length();
+	        						for(int b=0;b<length;b++){
+	        							weldid = "0" + weldid;
+	        						}
+	        					}
+	        					
+	        					sb.replace(14, 18, junctionid);
+	        					sb.replace(18, 22, weldid);
+	        					countweld = 0;
+	        					
+	        				}else{
+	        					countweld++;
+	        					if(countweld == listweld.size()/4){
+	        						sb.replace(14, 18, "0000");
+	        						sb.replace(18, 22, "0000");
+	        						countweld = 0;
+	        					}
+	        				}
+	        			}
+	        			
+	        			//焊工编号对应id
+	        			for(int a=0;a<listwelder.size();a+=2){
+	        				if(Integer.valueOf(listwelder.get(a+1)) == (Integer.parseInt(welder,16))){
+	        					String welderid = listwelder.get(a);
+	        					
+	        					if(welderid.length() != 4){
+	        						int length = 4 - welderid.length();
+	        						for(int b=0;b<length;b++){
+	        							welderid = "0" + welderid;
+	        						}
+	        					}
+	        					
+	        					sb.replace(34, 38, welderid);
+	        					countwelder = 0;
+	        					
+	        				}else{
+	        					countwelder++;
+	        					if(countwelder == listwelder.size()/2){
+	        						sb.replace(34, 38, "0000");
+	        						countwelder = 0;
+	        					}
+	        				}
+	        			}
+	        			
+	        			//焊口编号对应id(有三组数据的焊口)
+	        			for(int a=0;a<listjunction.size();a+=2){
+	        				if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction1,16))){
+	        					String junctionid = listjunction.get(a);
+	        					
+	        					if(junctionid.length() != 8){
+	        						int length = 8 - junctionid.length();
+	        						for(int b=0;b<length;b++){
+	        							junctionid = "0" + junctionid;
+	        						}
+	        					}
+	        					
+	        					sb.replace(70, 78, junctionid);
+	        					countjunction = 0;
+	        					
+	        				}else{
+	        					countjunction++;
+	        					if(countjunction == listjunction.size()/2){
+	        						sb.replace(70, 78, "00000000");
+	        						countjunction = 0;
+	        					}
+	        				}
+	        			}
+	        			
+	        			for(int a=0;a<listjunction.size();a+=2){
+	        				if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction2,16))){
+	        					String junctionid = listjunction.get(a);
+	        					
+	        					if(junctionid.length() != 8){
+	        						int length = 8 - junctionid.length();
+	        						for(int b=0;b<length;b++){
+	        							junctionid = "0" + junctionid;
+	        						}
+	        					}
+	        					
+	        					sb.replace(134, 142, junctionid);
+	        					countjunction = 0;
+	        					
+	        				}else{
+	        					countjunction++;
+	        					if(countjunction == listjunction.size()/2){
+	        						sb.replace(134, 142, "00000000");
+	        						countjunction = 0;
+	        					}
+	        				}
+	        			}
+	        			
+	        			for(int a=0;a<listjunction.size();a+=2){
+	        				if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction3,16))){
+	        					String junctionid = listjunction.get(a);
+	        					
+	        					if(junctionid.length() != 8){
+	        						int length = 8 - junctionid.length();
+	        						for(int b=0;b<length;b++){
+	        							junctionid = "0" + junctionid;
+	        						}
+	        					}
+	        					
+	        					sb.replace(198, 206, junctionid);
+	        					countjunction = 0;
+	        					
+	        				}else{
+	        					countjunction++;
+	        					if(countjunction == listjunction.size()/2){
+	        						sb.replace(198, 206, "00000000");
+	        						countjunction = 0;
+	        					}
+	        				}
+	        			}
+	        			
+	        			str = sb.toString();
+	          	    	
+	                }
+	            }
+	        }
+			return str;
 		}
 		
 		private String transJN(String str) {
@@ -241,32 +391,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
             	}
             }
             
-            /*weld = Integer.toHexString(Integer.valueOf(weld));
-            if(weld.length()<4){
-            	int length = 4 - weld.length();
-            	for(int i=0;i<length;i++){
-            		weld = "0" + weld;
-            	}
-            }*/
-            
-            /*String welder1 = Integer.valueOf(strdata.substring(20,22),16).toString(); 
-            String welder2 = Integer.valueOf(strdata.substring(22,24),16).toString();
-            String welder3 = Integer.valueOf(strdata.substring(24,26),16).toString();
-            String welder4 = Integer.valueOf(strdata.substring(26,28),16).toString();
-            String welder = welder1 + "," + welder2 + ","+ welder3 + ","+ welder4;
-            StringBuffer sbu = new StringBuffer();  
-            String[] chars = welder.split(",");  
-            for (int i = 0; i < chars.length; i++) {  
-                sbu.append((char) Integer.parseInt(chars[i]));  
-            }  	
-            welder = Integer.toHexString(Integer.valueOf(sbu.toString()));
-            if(welder.length()!=4){
-            	int lenth = 4 - welder.length();
-            	for(int i=0;i<lenth;i++){
-            		welder = "0" + welder;
-            	}
-            }*/
-            
             String electricity1 = strdata.substring(28,32);
             
             String electricity2 = strdata.substring(78,82);
@@ -286,26 +410,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
             String status2 = strdata.substring(106,108);
             
             String status3 = strdata.substring(156,158);
-            
-            /*if(First){
-            	timetran = new Date();
-            	timetran1 = timetran.getTime();
-                time11 = new Date(timetran1);
-                timetran2 = timetran1 + 1000;
-                time22 = new Date(timetran2);
-                timetran3 = timetran2 + 1000;
-                time33 = new Date(timetran3);
-                timetran1 = timetran3;
-            	First = false;
-            }else{
-            	timetran1 = timetran1 + 1000;
-                time11 = new Date(timetran1);
-            	timetran2 = timetran1 + 1000;
-                time22 = new Date(timetran2);
-                timetran3 = timetran2 + 1000;
-                time33 = new Date(timetran3);
-                timetran1 = timetran3;
-            }*/
             
             timetran = new Date();
         	timetran1 = timetran.getTime();
@@ -429,17 +533,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
             if(second163.length()==1){
             	second163='0'+second163;
           	}
-            
-            /*String status1 = "00";
-            String status2 = "00";
-            String status3 = "00";
-            if(electricityint1 != 0){
-            	status1 = "03";
-            }else if(electricityint2 != 0){
-            	status2 = "03";
-            }else if(electricityint3 != 0){
-            	status3 = "03";
-            }*/
             
             String datesend = "00003101" + weld + welder + code 
             + electricity1 + voltage1 + "0000" + status1 + year161 + month161 + day161 + hour161 + minute161 + second161 

@@ -19,6 +19,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
+//作为客户端连接服务器
 public class Clientconnect  
 {  
   public MainFrame mainFrame;
