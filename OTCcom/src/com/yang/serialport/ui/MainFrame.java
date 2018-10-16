@@ -459,7 +459,7 @@ public class MainFrame extends JFrame {
 	                	//加入编码解码之后,不能加入utf-8编码,加入之后0x80之后的数错误
 	                	//chsoc.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));    
 	                	//chsoc.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-						
+	                	
 						//焊机连接上后,存入list数组中
 	                    chsoc.pipeline().addLast(NS);
 	                    socketcount++;

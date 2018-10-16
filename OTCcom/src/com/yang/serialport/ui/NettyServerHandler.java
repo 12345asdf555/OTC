@@ -62,7 +62,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	public Date time33;
 	
 	 public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		 
 		 ByteBuf buf=(ByteBuf)msg; 
 		 byte[] req=new byte[buf.readableBytes()];  
 	     buf.readBytes(req);
