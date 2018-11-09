@@ -73,13 +73,16 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	         workThread = new Thread(ws);  
 	         workThread.start();
 	         
+	         //ReferenceCountUtil.release(msg);
+			 ReferenceCountUtil.release(req);
+			 ReferenceCountUtil.release(buf);
 		 }catch(Exception e){
 			 System.out.println("1");
 			 e.printStackTrace();
 			 
 		 }finally{
-			 ReferenceCountUtil.release(msg);
-			 ReferenceCountUtil.release(req);
+//			 ReferenceCountUtil.release(msg);
+//			 ReferenceCountUtil.release(req);
 			 
 		 }
 	}
@@ -100,7 +103,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			try{
 				
 				for(int i=0;i<req.length;i++){
-		             
 		             //判断为数字还是字母，若为字母+256取正数
 		             if(req[i]<0){
 		               String r = Integer.toHexString(req[i]+256);
@@ -134,6 +136,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
 					         dataView.append(" " + str + "\r\n");
+					 		 dataView.setCaretPosition(dataView.getText().length());  
 				          }catch(Exception ex){
 							 ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");
@@ -148,6 +151,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				          try{
 				        	  chcli.writeAndFlush(str).sync();
 					          dataView.append("实时:" + str + "\r\n");
+					          dataView.setCaretPosition(dataView.getText().length());  
 				          }catch(Exception ex){
 							 ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");
@@ -160,6 +164,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 						  try{
 		        	  		  chcli.writeAndFlush(str).sync();
 							  dataView.append("上行:" + str + "\r\n");
+							  dataView.setCaretPosition(dataView.getText().length());  
 				          }catch(Exception ex){
 							 ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");
@@ -210,150 +215,250 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	        			String junction2 = str.substring(134, 142);
 	        			String junction3 = str.substring(198, 206);
 	        			
-	        			int countweld = 0;
-	        			int countwelder = 0;
-	        			int countjunction = 0;
-	        			
-	        			//焊机编号对应id
-	        			if(listweld.size()==0){
-	        				sb.replace(14, 18, "0000");
-    						sb.replace(18, 22, "0000");
-	        			}else{
-	        				for(int a=0;a<listweld.size();a+=4){
-		        				if(Integer.valueOf(listweld.get(a+1)) == (Integer.parseInt(weld,16))){
-		        					String junctionid = listweld.get(a);
-		        					String weldid = listweld.get(a+2);
-		        					
-		        					if(junctionid.length() != 4){
-		        						int length = 4 - junctionid.length();
-		        						for(int b=0;b<length;b++){
-		        							junctionid = "0" + junctionid;
-		        						}
-		        					}
-		        					
-		        					if(weldid.length() != 4){
-		        						int length = 4 - weldid.length();
-		        						for(int b=0;b<length;b++){
-		        							weldid = "0" + weldid;
-		        						}
-		        					}
-		        					
-		        					sb.replace(14, 18, junctionid);
-		        					sb.replace(18, 22, weldid);
-		        					countweld = 0;
-		        					
-		        				}else{
-		        					countweld++;
-		        					if(countweld == listweld.size()/4){
-		        						sb.replace(14, 18, "0000");
-		        						sb.replace(18, 22, "0000");
-		        						countweld = 0;
-		        					}
-		        				}
-		        			}
-	        			}
-	        			
-	        			//焊工编号对应id
-	        			if(listwelder.size()==0){
-	        				sb.replace(34, 38, "0000");
-	        			}else{
-	        				for(int a=0;a<listwelder.size();a+=2){
-		        				if(Integer.valueOf(listwelder.get(a+1)) == (Integer.parseInt(welder,16))){
-		        					String welderid = listwelder.get(a);
-		        					
-		        					if(welderid.length() != 4){
-		        						int length = 4 - welderid.length();
-		        						for(int b=0;b<length;b++){
-		        							welderid = "0" + welderid;
-		        						}
-		        					}
-		        					
-		        					sb.replace(34, 38, welderid);
-		        					countwelder = 0;
-		        					
-		        				}else{
-		        					countwelder++;
-		        					if(countwelder == listwelder.size()/2){
-		        						sb.replace(34, 38, "0000");
-		        						countwelder = 0;
-		        					}
-		        				}
-		        			}
-	        			}
-	        			
-	        			//焊口编号对应id(有三组数据的焊口)
-	        			if(listjunction.size()==0){
-	        				sb.replace(70, 78, "00000000");
-	        				sb.replace(134, 142, "00000000");
-	        				sb.replace(198, 206, "00000000");
-	        			}else{
-	        				for(int a=0;a<listjunction.size();a+=2){
-		        				if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction1,16))){
-		        					String junctionid = listjunction.get(a);
-		        					
-		        					if(junctionid.length() != 8){
-		        						int length = 8 - junctionid.length();
-		        						for(int b=0;b<length;b++){
-		        							junctionid = "0" + junctionid;
-		        						}
-		        					}
-		        					
-		        					sb.replace(70, 78, junctionid);
-		        					countjunction = 0;
-		        					
-		        				}else{
-		        					countjunction++;
-		        					if(countjunction == listjunction.size()/2){
-		        						sb.replace(70, 78, "00000000");
-		        						countjunction = 0;
-		        					}
-		        				}
+	        			//江南任务模式
+	        			if(Integer.valueOf(welder)==0 && Integer.valueOf(junction1)==0 && Integer.valueOf(junction2)==0 && Integer.valueOf(junction3)==0){
+	        				
+		        			//焊机编号对应id
+	        				int countweld = 0;
+	        				String weldid = "";
+		        			if(listweld.size()==0){
+		        				sb.replace(14, 18, "0000");
+	    						sb.replace(18, 22, "0000");
+		        			}else{
+		        				for(int a=0;a<listweld.size();a+=4){
+			        				if(Integer.valueOf(listweld.get(a+1)) == (Integer.parseInt(weld,16))){
+			        					String gatherid = listweld.get(a);
+			        					weldid = listweld.get(a+2);
+			        					
+			        					if(gatherid.length() != 4){
+			        						int length = 4 - gatherid.length();
+			        						for(int b=0;b<length;b++){
+			        							gatherid = "0" + gatherid;
+			        						}
+			        					}
+			        					
+			        					if(weldid.length() != 4){
+			        						int length = 4 - weldid.length();
+			        						for(int b=0;b<length;b++){
+			        							weldid = "0" + weldid;
+			        						}
+			        					}
+			        					
+			        					sb.replace(14, 18, gatherid);
+			        					sb.replace(18, 22, weldid);
+			        					countweld = 0;
+			        					
+			        					break;
+			        				}else{
+			        					countweld++;
+			        					if(countweld == listweld.size()/4){
+			        						sb.replace(14, 18, "0000");
+			        						sb.replace(18, 22, "0000");
+			        						countweld = 0;
+			        					}
+			        				}
+			        			}
 		        			}
 		        			
-		        			for(int a=0;a<listjunction.size();a+=2){
-		        				if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction2,16))){
-		        					String junctionid = listjunction.get(a);
-		        					
-		        					if(junctionid.length() != 8){
-		        						int length = 8 - junctionid.length();
-		        						for(int b=0;b<length;b++){
-		        							junctionid = "0" + junctionid;
-		        						}
-		        					}
-		        					
-		        					sb.replace(134, 142, junctionid);
-		        					countjunction = 0;
-		        					
-		        				}else{
-		        					countjunction++;
-		        					if(countjunction == listjunction.size()/2){
-		        						sb.replace(134, 142, "00000000");
-		        						countjunction = 0;
-		        					}
-		        				}
+		        			//江南任务下发,重置焊工id,焊口(任务id)
+		        			if(listarrayJN.size()==0){
+		        				sb.replace(34, 38, "0000");
+		        				sb.replace(70, 78, "00000000");
+		        				sb.replace(134, 142, "00000000");
+		        				sb.replace(198, 206, "00000000");
+		        			}else{
+		        				sb.replace(34, 38, "0000");
+		        				sb.replace(70, 78, "00000000");
+		        				sb.replace(134, 142, "00000000");
+		        				sb.replace(198, 206, "00000000");
+		        				String welder1 = "0000";
+		        				String code = "00000000";
+		        				for(int i=0;i<listarrayJN.size();i+=5){
+			                    	if(Integer.valueOf(weldid).toString().equals(listarrayJN.get(i+2))){
+			                    		welder1 = listarrayJN.get(i+1);
+			                    		if(welder1!=""){
+			                        		if(welder1.length()<4){
+			                                	int length = 4 - welder1.length();
+			                                	for(int j=0;j<length;j++){
+			                                		welder1 = "0" + welder1;
+			                                	}
+			                                }
+			                    		}else{
+			                    			welder1 = "0000";
+			                    		}
+			                    		
+			                    		code = listarrayJN.get(i);
+			                    		if(code!=""){
+			                        		if(code.length()!=8){
+			                        			int length = 8 - code.length();
+			                        			for(int i1=0;i1<length;i1++){
+			                        				code = "0" + code;
+			                                	}
+			                        		}
+			                        		code.toUpperCase();
+			                    		}else{
+			                    			code = "00000000";
+			                    		}
+
+				                    	break;
+			                    	}
+			                    }
+		        				sb.replace(34, 38, welder1);
+		        				sb.replace(70, 78, code);
+		        				sb.replace(134, 142, code);
+		        				sb.replace(198, 206, code);
 		        			}
 		        			
-		        			for(int a=0;a<listjunction.size();a+=2){
-		        				if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction3,16))){
-		        					String junctionid = listjunction.get(a);
-		        					
-		        					if(junctionid.length() != 8){
-		        						int length = 8 - junctionid.length();
-		        						for(int b=0;b<length;b++){
-		        							junctionid = "0" + junctionid;
-		        						}
-		        					}
-		        					
-		        					sb.replace(198, 206, junctionid);
-		        					countjunction = 0;
-		        					
-		        				}else{
-		        					countjunction++;
-		        					if(countjunction == listjunction.size()/2){
-		        						sb.replace(198, 206, "00000000");
-		        						countjunction = 0;
-		        					}
-		        				}
+		        			str = sb.toString();
+		        			
+	        			}else{
+	        				
+	        				//无任务下发模式
+	        				int countweld = 0;
+		        			int countwelder = 0;
+		        			int countjunction = 0;
+		        			
+		        			//焊机编号对应id
+		        			if(listweld.size()==0){
+		        				sb.replace(14, 18, "0000");
+	    						sb.replace(18, 22, "0000");
+		        			}else{
+		        				for(int a=0;a<listweld.size();a+=4){
+			        				if(Integer.valueOf(listweld.get(a+1)) == (Integer.parseInt(weld,16))){
+			        					String gatherid = listweld.get(a);
+			        					String weldid = listweld.get(a+2);
+			        					
+			        					if(gatherid.length() != 4){
+			        						int length = 4 - gatherid.length();
+			        						for(int b=0;b<length;b++){
+			        							gatherid = "0" + gatherid;
+			        						}
+			        					}
+			        					
+			        					if(weldid.length() != 4){
+			        						int length = 4 - weldid.length();
+			        						for(int b=0;b<length;b++){
+			        							weldid = "0" + weldid;
+			        						}
+			        					}
+			        					
+			        					sb.replace(14, 18, gatherid);
+			        					sb.replace(18, 22, weldid);
+			        					countweld = 0;
+			        					
+			        				}else{
+			        					countweld++;
+			        					if(countweld == listweld.size()/4){
+			        						sb.replace(14, 18, "0000");
+			        						sb.replace(18, 22, "0000");
+			        						countweld = 0;
+			        					}
+			        				}
+			        			}
+		        			}
+		        			
+		        			//焊工编号对应id
+		        			if(listwelder.size()==0){
+		        				sb.replace(34, 38, "0000");
+		        			}else{
+		        				for(int a=0;a<listwelder.size();a+=2){
+			        				if(Integer.valueOf(listwelder.get(a+1)) == (Integer.parseInt(welder,16))){
+			        					String welderid = listwelder.get(a);
+			        					
+			        					if(welderid.length() != 4){
+			        						int length = 4 - welderid.length();
+			        						for(int b=0;b<length;b++){
+			        							welderid = "0" + welderid;
+			        						}
+			        					}
+			        					
+			        					sb.replace(34, 38, welderid);
+			        					countwelder = 0;
+			        					
+			        				}else{
+			        					countwelder++;
+			        					if(countwelder == listwelder.size()/2){
+			        						sb.replace(34, 38, "0000");
+			        						countwelder = 0;
+			        					}
+			        				}
+			        			}
+		        			}
+		        			
+		        			//焊口编号对应id(有三组数据的焊口)
+		        			if(listjunction.size()==0){
+		        				sb.replace(70, 78, "00000000");
+		        				sb.replace(134, 142, "00000000");
+		        				sb.replace(198, 206, "00000000");
+		        			}else{
+		        				for(int a=0;a<listjunction.size();a+=2){
+			        				if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction1,16))){
+			        					String junctionid = listjunction.get(a);
+			        					
+			        					if(junctionid.length() != 8){
+			        						int length = 8 - junctionid.length();
+			        						for(int b=0;b<length;b++){
+			        							junctionid = "0" + junctionid;
+			        						}
+			        					}
+			        					
+			        					sb.replace(70, 78, junctionid);
+			        					countjunction = 0;
+			        					
+			        				}else{
+			        					countjunction++;
+			        					if(countjunction == listjunction.size()/2){
+			        						sb.replace(70, 78, "00000000");
+			        						countjunction = 0;
+			        					}
+			        				}
+			        			}
+			        			
+			        			for(int a=0;a<listjunction.size();a+=2){
+			        				if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction2,16))){
+			        					String junctionid = listjunction.get(a);
+			        					
+			        					if(junctionid.length() != 8){
+			        						int length = 8 - junctionid.length();
+			        						for(int b=0;b<length;b++){
+			        							junctionid = "0" + junctionid;
+			        						}
+			        					}
+			        					
+			        					sb.replace(134, 142, junctionid);
+			        					countjunction = 0;
+			        					
+			        				}else{
+			        					countjunction++;
+			        					if(countjunction == listjunction.size()/2){
+			        						sb.replace(134, 142, "00000000");
+			        						countjunction = 0;
+			        					}
+			        				}
+			        			}
+			        			
+			        			for(int a=0;a<listjunction.size();a+=2){
+			        				if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction3,16))){
+			        					String junctionid = listjunction.get(a);
+			        					
+			        					if(junctionid.length() != 8){
+			        						int length = 8 - junctionid.length();
+			        						for(int b=0;b<length;b++){
+			        							junctionid = "0" + junctionid;
+			        						}
+			        					}
+			        					
+			        					sb.replace(198, 206, junctionid);
+			        					countjunction = 0;
+			        					
+			        				}else{
+			        					countjunction++;
+			        					if(countjunction == listjunction.size()/2){
+			        						sb.replace(198, 206, "00000000");
+			        						countjunction = 0;
+			        					}
+			        				}
+			        			}
 		        			}
 	        			}
 	        			

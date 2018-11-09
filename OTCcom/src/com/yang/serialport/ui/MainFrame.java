@@ -76,6 +76,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -194,13 +197,6 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 		}
 		
-		//webservice配置
-		iutil  =  new IsnullUtil();
-		dcf = JaxWsDynamicClientFactory.newInstance();
-		client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		//client = dcf.createClient("http://" + "121.196.222.216" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		iutil.Authority(client);
-		
 		if(fitemid.length()!=2){
     		int count = 2-fitemid.length();
     		for(int i=0;i<count;i++){
@@ -213,6 +209,14 @@ public class MainFrame extends JFrame {
 		//加载界面布局
 		initView();
 		initComponents();
+		
+
+		//webservice配置
+		iutil  =  new IsnullUtil();
+		dcf = JaxWsDynamicClientFactory.newInstance();
+		client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		//client = dcf.createClient("http://" + "192.168.3.76" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		iutil.Authority(client);
 		
 		//功能实现线程
 		Timer tExit1 = null; 
@@ -257,15 +261,9 @@ public class MainFrame extends JFrame {
 			}
 			
 			//任务下发
-			/*iutil  =  new IsnullUtil();
-			dcf = JaxWsDynamicClientFactory.newInstance();
-			//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-			client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-			iutil.Authority(client);
-			
-			String obj1 = "{\"CLASSNAME\":\"junctionWebServiceImpl\",\"METHOD\":\"getWeldedJunctionAll\"}";
+			String obj1111 = "{\"CLASSNAME\":\"junctionWebServiceImpl\",\"METHOD\":\"getWeldedJunctionAll\"}";
 			Object[] objects = client.invoke(new QName("http://webservice.ssmcxf.sshome.com/", "enterNoParamWs"),
-					new Object[] { obj1 });
+					new Object[] { obj1111 });
 			String restr = objects[0].toString();
 	        JSONArray ary = JSONArray.parseArray(restr);
 	        
@@ -278,8 +276,53 @@ public class MainFrame extends JFrame {
 		        
 		        if(js.getString("OPERATESTATUS").equals("1")){
 	        		listarraybuf.add(js.getString("ID"));
-	        	}else{
-	        		
+	        	}
+	        }
+	        
+	        if(listarraybuf.size()==0){
+	        	for(int i=0;i<ary.size();i++){
+			        String str = ary.getString(i);
+			        JSONObject js = JSONObject.fromObject(str);
+			        
+    				if(js.getString("OPERATESTATUS").equals("0") || js.getString("OPERATESTATUS").equals("2")){
+    					if(listarrayJN.size()==0){
+    						listarrayJN.add(js.getString("ID"));
+    			        	listarrayJN.add(js.getString("REWELDERID"));
+    			        	listarrayJN.add(js.getString("MACHINEID"));
+    			        	listarrayJN.add(js.getString("OPERATESTATUS"));
+    			        	listarrayJN.add(js.getString("MACHINENO"));
+    					}else{
+    						int count = 0;
+    						for(int i1=0;i1<listarrayJN.size();i1+=5){
+    							if(!listarrayJN.get(i1).equals(js.getString("ID"))){
+    								count++;
+    								if(count==listarrayJN.size()/5){
+        								listarrayJN.add(js.getString("ID"));
+        					        	listarrayJN.add(js.getString("REWELDERID"));
+        					        	listarrayJN.add(js.getString("MACHINEID"));
+        					        	listarrayJN.add(js.getString("OPERATESTATUS"));
+        					        	listarrayJN.add(js.getString("MACHINENO"));
+        					        	break;
+    								}
+    							}else if(listarrayJN.get(i1+3).equals("0") && js.getString("OPERATESTATUS").equals("2")){
+    								for(int j=0;j<5;j++){
+    									listarrayJN.remove(i1);
+    								}
+    								listarrayJN.add(js.getString("ID"));
+    					        	listarrayJN.add(js.getString("REWELDERID"));
+    					        	listarrayJN.add(js.getString("MACHINEID"));
+    					        	listarrayJN.add(js.getString("OPERATESTATUS"));
+    					        	listarrayJN.add(js.getString("MACHINENO"));
+    							}
+    						}
+    					}
+			        }
+		        }
+	        }else if(listarraybuf.size()!=0){
+	        	for(int i=0;i<ary.size();i++){
+			        String str = ary.getString(i);
+			        JSONObject js = JSONObject.fromObject(str);
+			        
 	        		int count1=0;
 	        		for(int l=0;l<listarraybuf.size();l++){
 	        			if(listarraybuf.get(l).equals(js.getString("ID"))){
@@ -287,20 +330,48 @@ public class MainFrame extends JFrame {
 	        			}else{
 	        				count1++;
 	        				if(count1==listarraybuf.size()){
-		        				if(js.getString("OPERATESTATUS").equals("0") || js.getString("OPERATESTATUS").equals("2")){
-		    			        	listarrayJN.add(js.getString("ID"));
-		    			        	listarrayJN.add(js.getString("REWELDERID"));
-		    			        	listarrayJN.add(js.getString("MACHINEID"));
-		    			        	listarrayJN.add(js.getString("OPERATESTATUS"));
-		    			        	listarrayJN.add(js.getString("MACHINENO"));
-		    			        }
+	        					if(js.getString("OPERATESTATUS").equals("0") || js.getString("OPERATESTATUS").equals("2")){
+	            					if(listarrayJN.size()==0){
+	            						listarrayJN.add(js.getString("ID"));
+	            			        	listarrayJN.add(js.getString("REWELDERID"));
+	            			        	listarrayJN.add(js.getString("MACHINEID"));
+	            			        	listarrayJN.add(js.getString("OPERATESTATUS"));
+	            			        	listarrayJN.add(js.getString("MACHINENO"));
+	            					}else{
+	            						int count = 0;
+	            						for(int i1=0;i1<listarrayJN.size();i1+=5){
+	            							if(!listarrayJN.get(i1).equals(js.getString("ID"))){
+	            								count++;
+	            								if(count==listarrayJN.size()/5){
+	                								listarrayJN.add(js.getString("ID"));
+	                					        	listarrayJN.add(js.getString("REWELDERID"));
+	                					        	listarrayJN.add(js.getString("MACHINEID"));
+	                					        	listarrayJN.add(js.getString("OPERATESTATUS"));
+	                					        	listarrayJN.add(js.getString("MACHINENO"));
+	                					        	break;
+	            								}
+	            							}else if(listarrayJN.get(i1+3).equals("0") && js.getString("OPERATESTATUS").equals("2")){
+	            								for(int j=0;j<5;j++){
+	            									listarrayJN.remove(i1);
+	            								}
+	            								listarrayJN.add(js.getString("ID"));
+	            					        	listarrayJN.add(js.getString("REWELDERID"));
+	            					        	listarrayJN.add(js.getString("MACHINEID"));
+	            					        	listarrayJN.add(js.getString("OPERATESTATUS"));
+	            					        	listarrayJN.add(js.getString("MACHINENO"));
+	            							}
+	            						}
+	            					}
+	        			        }
 	        				}
 	        			}
 	        		}
-	        	}
+		        	
+		        }
 	        }
+	        
 	        NS.listarrayJN = listarrayJN;
-	        }*/
+	        }
 		        
 			//任务编号对应
 			String obj1 = "{\"CLASSNAME\":\"junctionWebServiceImpl\",\"METHOD\":\"getWeldedJunctionAll\"}";
@@ -383,6 +454,36 @@ public class MainFrame extends JFrame {
 	public void initComponents() {
 		// 数据显示
 		dataView.setFocusable(false);
+		dataView.getDocument().addDocumentListener(new DocumentListener(){
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				SwingUtilities.invokeLater(new Runnable(){
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						if(dataView.getLineCount() >= 1000){
+							int end = 0;
+							try{
+								end = dataView.getLineEndOffset(500);
+							}catch (Exception e) {  
+                            }  
+							dataView.replaceRange("", 0, end);
+						}
+					}
+				});
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		scrollDataView.setBounds(10, 10, 475, 300);
 		add(scrollDataView);
 
