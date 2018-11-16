@@ -216,7 +216,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	        			String junction3 = str.substring(198, 206);
 	        			
 	        			//江南任务模式
-	        			if(Integer.valueOf(welder)==0 && Integer.valueOf(junction1)==0 && Integer.valueOf(junction2)==0 && Integer.valueOf(junction3)==0){
+	        			if(Integer.parseInt(welder,16)==0 && Integer.parseInt(junction1,16)==0 && Integer.parseInt(junction2,16)==0 && Integer.parseInt(junction3,16)==0){
 	        				
 		        			//焊机编号对应id
 	        				int countweld = 0;

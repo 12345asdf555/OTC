@@ -60,7 +60,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 				 }
 			 }else if(JN[4].equals("2")){  //任务修改
 				 for(int i=0;i<listarrayJN.size();i+=5){
-					 if(listarrayJN.get(i).equals(JN[1])){
+					 if(listarrayJN.get(i+1).equals(JN[2])){
 						 listarrayJN.set(i, JN[1]);
 						 listarrayJN.set(i+1, JN[2]);
 						 listarrayJN.set(i+2, JN[3]);
