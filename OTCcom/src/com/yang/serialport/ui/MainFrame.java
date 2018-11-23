@@ -57,6 +57,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -209,24 +210,29 @@ public class MainFrame extends JFrame {
 		//加载界面布局
 		initView();
 		initComponents();
-		
 
 		//webservice配置
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
-		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://" + "121.196.222.216" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		//client = dcf.createClient("http://" + "192.168.3.46" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
-		//功能实现线程
-		Timer tExit1 = null; 
-		tExit1 = new Timer();  
-        tExit1.schedule(new TimerTask() {
-			@Override  
-            public void run() {
+        Calendar calendarmail = Calendar.getInstance();
+        calendarmail.add(Calendar.DAY_OF_MONTH, 1);
+        calendarmail.set(Calendar.HOUR_OF_DAY, 7); // 控制时
+        calendarmail.set(Calendar.MINUTE, 00);    // 控制分
+        calendarmail.set(Calendar.SECOND, 00);    // 控制秒
+        Date time = calendarmail.getTime();
+        Timer tExit2 = new Timer();
+        tExit2.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
 				ser();
-			}  
-        }, 3600000,3600000);
+				NS.listarrayJN.clear();
+			}
+        }, time, 86400000);
         
         ser();
 		
