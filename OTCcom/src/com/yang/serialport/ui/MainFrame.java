@@ -229,10 +229,18 @@ public class MainFrame extends JFrame {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				ser();
 				NS.listarrayJN.clear();
 			}
         }, time, 86400000);
+        
+        Timer tExit3 = new Timer();
+        tExit3.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				ser();
+			}
+        }, 3600000, 3600000);
         
         ser();
 		
