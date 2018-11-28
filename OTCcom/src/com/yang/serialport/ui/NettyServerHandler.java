@@ -136,7 +136,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
 					         dataView.append(" " + str + "\r\n");
-					 		 dataView.setCaretPosition(dataView.getText().length());  
 				          }catch(Exception ex){
 							 ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");
@@ -150,8 +149,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				          
 				          try{
 				        	  chcli.writeAndFlush(str).sync();
-					          dataView.append("实时:" + str + "\r\n");
-					          dataView.setCaretPosition(dataView.getText().length());  
+					          dataView.append("实时:" + str + "\r\n"); 
 				          }catch(Exception ex){
 							 ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");
@@ -163,8 +161,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 						  
 						  try{
 		        	  		  chcli.writeAndFlush(str).sync();
-							  dataView.append("上行:" + str + "\r\n");
-							  dataView.setCaretPosition(dataView.getText().length());  
+							  dataView.append("上行:" + str + "\r\n");  
 				          }catch(Exception ex){
 							 ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");

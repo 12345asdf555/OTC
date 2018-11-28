@@ -44,9 +44,22 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			 String[] JN = str.split(",");
 			 
 			 if(JN[4].equals("0")){  //任务开始
-				 for(int i=1;i<JN.length;i++){
-					 listarrayJN.add(JN[i]);
-					 client.NS.listarrayJN  = listarrayJN;
+				 if(!listarrayJN.contains(JN[1])){
+					 for(int i=1;i<JN.length;i++){
+						 listarrayJN.add(JN[i]);
+						 client.NS.listarrayJN  = listarrayJN;
+					 }
+				 }else{
+					 for(int i=0;i<listarrayJN.size();i+=5){
+						 if(listarrayJN.get(i).equals(JN[1])){
+							 listarrayJN.set(i, JN[1]);
+							 listarrayJN.set(i+1, JN[2]);
+							 listarrayJN.set(i+2, JN[3]);
+							 listarrayJN.set(i+3, JN[4]);
+							 listarrayJN.set(i+4, JN[5]);
+							 client.NS.listarrayJN  = listarrayJN;
+						 }
+					 }
 				 }
 			 }else if(JN[4].equals("1")){  //任务完成
 				 for(int i=0;i<listarrayJN.size();i+=5){
