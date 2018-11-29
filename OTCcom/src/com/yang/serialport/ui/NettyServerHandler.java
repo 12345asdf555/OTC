@@ -271,34 +271,39 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		        				String welder1 = "0000";
 		        				String code = "00000000";
 		        				for(int i=0;i<listarrayJN.size();i+=5){
-			                    	if(Integer.valueOf(weldid).toString().equals(listarrayJN.get(i+2))){
-			                    		welder1 = listarrayJN.get(i+1);
-			                    		if(welder1!=""){
-			                        		if(welder1.length()<4){
-			                                	int length = 4 - welder1.length();
-			                                	for(int j=0;j<length;j++){
-			                                		welder1 = "0" + welder1;
-			                                	}
-			                                }
-			                    		}else{
-			                    			welder1 = "0000";
-			                    		}
-			                    		
-			                    		code = listarrayJN.get(i);
-			                    		if(code!=""){
-			                        		if(code.length()!=8){
-			                        			int length = 8 - code.length();
-			                        			for(int i1=0;i1<length;i1++){
-			                        				code = "0" + code;
-			                                	}
-			                        		}
-			                        		code.toUpperCase();
-			                    		}else{
-			                    			code = "00000000";
-			                    		}
+		        					if(weldid.equals("")){
+		        						welder1 = "0000";
+		        						code = "00000000";
+		        					}else{
+		        						if(Integer.valueOf(weldid).toString().equals(listarrayJN.get(i+2))){
+				                    		welder1 = listarrayJN.get(i+1);
+				                    		if(welder1!=""){
+				                        		if(welder1.length()<4){
+				                                	int length = 4 - welder1.length();
+				                                	for(int j=0;j<length;j++){
+				                                		welder1 = "0" + welder1;
+				                                	}
+				                                }
+				                    		}else{
+				                    			welder1 = "0000";
+				                    		}
+				                    		
+				                    		code = listarrayJN.get(i);
+				                    		if(code!=""){
+				                        		if(code.length()!=8){
+				                        			int length = 8 - code.length();
+				                        			for(int i1=0;i1<length;i1++){
+				                        				code = "0" + code;
+				                                	}
+				                        		}
+				                        		code.toUpperCase();
+				                    		}else{
+				                    			code = "00000000";
+				                    		}
 
-				                    	break;
-			                    	}
+					                    	break;
+				                    	}
+		        					}
 			                    }
 		        				sb.replace(34, 38, welder1);
 		        				sb.replace(70, 78, code);
