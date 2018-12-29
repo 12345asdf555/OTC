@@ -61,6 +61,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	public Date time22;
 	public long timetran3;
 	public Date time33;
+	public int pantime = 1;
 	
 	 public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		 ByteBuf buf = null;
@@ -123,12 +124,14 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		                 str+=r;  
 		              }
 		          }
-				
+
+				  str = tranpan(str); 
+				  
 				  if(str.length()>=6){
 					  
 					  if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22")) && str.length()==234){
 						  
-						  str = trans(str);
+						  str = trans(str); //融合有无任务模式
 						  //str = transOTC(str);
 						  //str = transJN(str);
 						  str=str.substring(0,232)+fitemid+"7D";
@@ -157,6 +160,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				          
 				          str = "";
 						  
+					  }else if(str.substring(0,6).equals("FE5AA5") && str.length()==186 && str.substring(40,44).equals("0101")){
+						  
+						  str = tranpan(str); 
+						  
 					  }else{
 						  
 						  try{
@@ -175,6 +182,206 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				 ex.printStackTrace();
 	 			 //dataView.append("数据接收错误" + "\r\n");
 			}
+		}
+		
+		private String tranpan(String str) {
+			// TODO Auto-generated method stub
+			String code = "7E7301010122";
+			
+			//松下焊机型号
+			//str.substring(112,130);
+			String type1 = Integer.valueOf(str.substring(112,114),16).toString(); 
+            String type2 = Integer.valueOf(str.substring(114,116),16).toString();
+            String type3 = Integer.valueOf(str.substring(116,118),16).toString();
+            String type4 = Integer.valueOf(str.substring(118,120),16).toString();
+            String type5 = Integer.valueOf(str.substring(120,122),16).toString(); 
+            String type6 = Integer.valueOf(str.substring(122,124),16).toString();
+            String type7 = Integer.valueOf(str.substring(124,126),16).toString();
+            String type8 = Integer.valueOf(str.substring(126,128),16).toString();
+            String type9 = Integer.valueOf(str.substring(128,130),16).toString();
+            String type = type1 + "," + type2 + ","+ type3 + ","+ type4 + "," + type5 + "," + type6 + ","+ type7 + ","+ type8 + "," + type9;
+            StringBuffer sbu = new StringBuffer();  
+            String[] chars = type.split(",");  
+            for (int i = 0; i < chars.length; i++) {  
+                sbu.append((char) Integer.parseInt(chars[i]));  
+            }  	
+            type = sbu.toString();
+            if(type.equals("YD-500GR3")){
+            	code = code + "6E";
+            }
+			
+			//松下焊机、采集模块编号
+			String weld = str.substring(10,14);
+			String weldid = "0000";
+			int countweld = 0;
+			for(int a=0;a<listweld.size();a+=4){
+				if(Integer.valueOf(listweld.get(a+1)) == (Integer.parseInt(weld,16))){
+					String gatherid = listweld.get(a);
+					weldid = listweld.get(a+2);
+					
+					if(gatherid.length() != 4){
+						int length = 4 - gatherid.length();
+						for(int b=0;b<length;b++){
+							gatherid = "0" + gatherid;
+						}
+					}
+					
+					if(weldid.length() != 4){
+						int length = 4 - weldid.length();
+						for(int b=0;b<length;b++){
+							weldid = "0" + weldid;
+						}
+					}
+					
+					code = code + gatherid;
+					code = code + weldid;
+					countweld = 0;
+					
+					break;
+				}else{
+					countweld++;
+					if(countweld == listweld.size()/4){
+						code = code + "0000";
+						code = code + "0000";
+						countweld = 0;
+					}
+				}
+			}
+			
+			//焊工编号对应id
+			//String welder = str.substring(130, 140);
+			String welder = "0000";
+			
+			//焊缝号
+			//String junction = str.substring(140, 150);
+			String junction = "0000";
+			
+			//江南任务下发,重置焊工id,焊口(任务id),松下
+			if(listarrayJN.size()==0){
+				welder = "0000";
+				junction = "0000";
+			}else{
+				for(int i=0;i<listarrayJN.size();i+=5){
+					if(weldid.equals("0000")){
+						welder = "0000";
+						junction = "00000000";
+					}else{
+						if(Integer.valueOf(weldid).toString().equals(listarrayJN.get(i+2))){
+							welder = listarrayJN.get(i+1);
+                    		if(welder!=""){
+                        		if(welder.length()<4){
+                                	int length = 4 - welder.length();
+                                	for(int j=0;j<length;j++){
+                                		welder = "0" + welder;
+                                	}
+                                }
+                    		}else{
+                    			welder = "0000";
+                    		}
+                    		
+                    		junction = listarrayJN.get(i);
+                    		if(junction!=""){
+                        		if(junction.length()!=8){
+                        			int length = 8 - junction.length();
+                        			for(int i1=0;i1<length;i1++){
+                        				junction = "0" + junction;
+                                	}
+                        		}
+                        		junction.toUpperCase();
+                    		}else{
+                    			junction = "00000000";
+                    		}
+
+	                    	break;
+                    	}
+					}
+                }
+			}
+			
+			//时间
+			String year = str.substring(48, 50);
+			String month = str.substring(50, 52);
+			String day = str.substring(52, 54);
+			String hour = str.substring(54, 56);
+			String minute = str.substring(56, 58);
+			String second = str.substring(58, 60);
+			code = code + year + month + day + hour + minute + second;
+			
+			//实际电流电压
+			String reelec = str.substring(96,100);
+			String revole = str.substring(100,104);
+			code = code + reelec + revole;
+			
+			//送死速度
+			String wirerate = str.substring(104,108);
+			code = code + wirerate;
+			
+			//给定电流电压
+			String setelec = str.substring(72,76);
+			String setvole = str.substring(76,80);
+			code = code + setelec + setvole;
+			
+			//状态
+			String status = str.substring(70,72);
+			if(status.equals("00")){
+				code = code + "00";
+			}else if(status.equals("01") || status.equals("02") || status.equals("03") || status.equals("04") || status.equals("05")){
+				code = code + "05";
+			}else if(status.equals("06") || status.equals("07") || status.equals("08") || status.equals("09")){
+				code = code + "03";
+			}else if(status.equals("0A") || status.equals("0B") || status.equals("0C") || status.equals("0D") || status.equals("0E")){
+				code = code + "07";
+			}
+			
+			//焊丝直径
+			String wiredia = str.substring(152,154);
+			if(wiredia.equals("00")){
+				code = code + "06";
+			}else if(wiredia.equals("01")){
+				code = code + "08";
+			}else if(wiredia.equals("02")){
+				code = code + "09";
+			}else if(wiredia.equals("03")){
+				code = code + "0A";
+			}else if(wiredia.equals("04")){
+				code = code + "0C";
+			}else if(wiredia.equals("05")){
+				code = code + "0E";
+			}else if(wiredia.equals("06")){
+				code = code + "10";
+			}
+			
+			//材质和气体
+			String mat = str.substring(150,152);
+			String gas = str.substring(154,156);
+			if(mat.equals("00") && gas.equals("00")){
+				code = code + "01";
+			}else if(mat.equals("00") && gas.equals("01")){
+				code = code + "02";
+			}else if(mat.equals("01") && gas.equals("02")){
+				code = code + "04";
+			}else if(mat.equals("02") && gas.equals("02")){
+				code = code + "07";
+			}else if(mat.equals("03") && gas.equals("02")){
+				code = code + "06";
+			}else if(mat.equals("04") && gas.equals("00")){
+				code = code + "03";
+			}else if(mat.equals("05") && gas.equals("00")){
+				code = code + "05";
+			}
+			
+			//预置电流电压
+			String maxelec = Integer.toHexString(Integer.valueOf(setelec,16)+50);
+			String minelec = Integer.toHexString(Integer.valueOf(setelec,16)-50);
+			String maxvolc = Integer.toHexString(Integer.valueOf(setvole,16)+50);
+			String minvolc = Integer.toHexString(Integer.valueOf(setvole,16)-50);
+			code = code + maxelec + minelec + maxvolc + minvolc;
+			
+			//通道
+			String channel = str.substring(164,166);
+			code = code +channel;
+			
+			return str;
 		}
 		
 		private String trans(String str) {
@@ -929,9 +1136,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
             return datesend;
 		}
 	 }
-	 
-	 
-	 
 	 
 	 public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {  
 		 //super.channelReadComplete(ctx);  
