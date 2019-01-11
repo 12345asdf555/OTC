@@ -24,6 +24,8 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 import net.sf.json.JSONObject;
+import service.weld.jn.ServiceCall;
+import service.weld.jn.ServiceCallResponse;
 
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
@@ -60,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -104,7 +107,14 @@ import com.yang.serialport.utils.ByteUtils;
 import com.yang.serialport.utils.ShowUtils;*/
 
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
+import org.datacontract.schemas._2004._07.jn_weld_service.CompositeType;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.sqlite.*;
+import org.tempuri.WeldServiceStub;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.cxf.endpoint.Client;
 
 import com.yang.serialport.ui.*;
@@ -210,12 +220,12 @@ public class MainFrame extends JFrame {
 		//加载界面布局
 		initView();
 		initComponents();
-
+		
 		//webservice配置
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
 		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://" + "121.196.222.216" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://" + "192.168.3.162" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
         Calendar calendarmail = Calendar.getInstance();
@@ -438,6 +448,7 @@ public class MainFrame extends JFrame {
  	        if(iffirst){
  	 			new Thread(work).start();
  	 			new Thread(cli).start();
+ 	 			new Thread(pan).start();
  	 			iffirst = false;
  	        }
  	        
@@ -525,6 +536,24 @@ public class MainFrame extends JFrame {
 		sendData.setBounds(70, 40, 90, 30);
 	}
 	
+	//松下实时数据获取
+	public Runnable pan =new Runnable(){
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+			Timer t = new Timer();
+			t.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+			    	NS.tranpan();
+				}
+			},1000,1000);
+			
+		}
+	};
+	
 	//socket连接服务器
 	public Runnable cli =new Runnable(){
 
@@ -610,7 +639,7 @@ public class MainFrame extends JFrame {
 		dataView.append(datesend + "\r\n");
 		
 	}
-		
+
 	public Runnable ser =new Runnable(){
 		@Override
 		public void run() {
