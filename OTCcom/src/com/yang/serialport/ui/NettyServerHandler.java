@@ -462,6 +462,100 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			        				}
 			        			}
 		        			}
+		        			try {
+		      				  FileInputStream in = new FileInputStream("IPconfig.txt");  
+		      		          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+		      		          BufferedReader bufReader = new BufferedReader(inReader);  
+		      		          String line = null; 
+		      		          int writetime=0;
+		      					
+		      				    while((line = bufReader.readLine()) != null){ 
+		      			                writetime++;
+		      			                if(writetime == 3){
+			      			                ip=line;
+		      			                }
+		      		          }  
+
+			      			} catch (FileNotFoundException e) {
+			      				// TODO Auto-generated catch block
+			      				e.printStackTrace();
+			      			} catch (IOException e) {
+			      				// TODO Auto-generated catch block
+			      				e.printStackTrace();
+			      			}
+		        			
+		        			if(ip.equals("true")){
+		        				int temp=0;
+			                	int gather = Integer.valueOf(str.substring(16,20), 16);
+			                	if(gather == 1 || gather == 2|| gather == 3|| gather == 4|| gather == 5|| gather == 6){
+				                	int eletric = Integer.valueOf(str.substring(56,60), 16);
+				                	if(eletric>=60 && eletric<255){
+				                		temp = (int)((4.23*eletric-200)/10);
+				                	}
+				                	else if(eletric>=255 && eletric<300){
+				                		temp = (int)((5.69*eletric-529)/10);
+				                	}
+				                	else if(eletric>300 && eletric<=400){
+				                		temp = (int)((5.77*eletric-553)/10);
+				                	}
+				                	else if(eletric>400 && eletric<=500){
+				                		temp = (int)((5.63*eletric-495)/10);
+				                	}
+				                	String speed = Integer.toHexString(temp);
+				                	if(speed.length() != 4){
+		        						int length = 4 - speed.length();
+		        						for(int b=0;b<length;b++){
+		        							speed = "0" + speed;
+		        						}
+		        					}
+				                	sb = sb.replace(64, 68, speed);
+				                	
+				                	int eletric1 = Integer.valueOf(str.substring(136,140), 16);
+				                	if(eletric1>=60 && eletric1<255){
+				                		temp = (int)((4.23*eletric1-200)/10);
+				                	}
+				                	else if(eletric1>=255 && eletric1<300){
+				                		temp = (int)((5.69*eletric1-529)/10);
+				                	}
+				                	else if(eletric1>300 && eletric1<=400){
+				                		temp = (int)((5.77*eletric1-553)/10);
+				                	}
+				                	else if(eletric1>400 && eletric1<=500){
+				                		temp = (int)((5.63*eletric1-495)/10);
+				                	}
+				                	String speed1 = Integer.toHexString(temp);
+				                	if(speed1.length() != 4){
+		        						int length = 4 - speed1.length();
+		        						for(int b=0;b<length;b++){
+		        							speed1 = "0" + speed1;
+		        						}
+		        					}
+				                	sb = sb.replace(144, 148, speed1);
+				                	
+				                	int eletric11 = Integer.valueOf(str.substring(216,220), 16);
+				                	if(eletric11>=60 && eletric11<255){
+				                		temp = (int)((4.23*eletric11-200)/10);
+				                	}
+				                	else if(eletric11>=255 && eletric11<300){
+				                		temp = (int)((5.69*eletric11-529)/10);
+				                	}
+				                	else if(eletric11>300 && eletric11<=400){
+				                		temp = (int)((5.77*eletric11-553)/10);
+				                	}
+				                	else if(eletric11>400 && eletric11<=500){
+				                		temp = (int)((5.63*eletric11-495)/10);
+				                	}
+				                	String speed2 = Integer.toHexString(temp);
+				                	if(speed2.length() != 4){
+		        						int length = 4 - speed2.length();
+		        						for(int b=0;b<length;b++){
+		        							speed2 = "0" + speed2;
+		        						}
+		        					}
+				                	sb = sb.replace(224, 228, speed2);
+			                	}
+		        			}
+		        			
 	        			}
 	        			
 	        			str = sb.toString();

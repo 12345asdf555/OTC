@@ -61,9 +61,9 @@ public class Clientconnect
 	                ip=line;
 	                writetime++;
 		    	}
-		    	else{
+		    	else if(writetime==1){
 		    		fitemid=line;
-		    		writetime=0;
+		    		writetime++;
 		    	}
           }  
 
