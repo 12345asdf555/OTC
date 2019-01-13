@@ -214,8 +214,8 @@ public class MainFrame extends JFrame {
 		//webservice配置
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
-		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://" + "121.196.222.216" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		//client = dcf.createClient("http://" + "121.196.222.216" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
 		//功能实现线程
