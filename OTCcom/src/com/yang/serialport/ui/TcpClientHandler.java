@@ -1,5 +1,10 @@
 package com.yang.serialport.ui;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -171,9 +176,35 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 	private void wcfget(String str, ChannelHandlerContext ctx) {
 		// TODO Auto-generated method stub
 		try {
-			
-			EndpointReference endpoint=new EndpointReference("http://192.168.3.212:8734/JN_WELD_Service/Service1/");
-			WeldServiceStub stu=new WeldServiceStub("http://192.168.3.212:8734/JN_WELD_Service/Service1/");
+			String ip = "";
+			try {
+				  FileInputStream in = new FileInputStream("IPconfig.txt");  
+		          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+		          BufferedReader bufReader = new BufferedReader(inReader);  
+		          String line = null; 
+		          int writetime=0;
+					
+				    while((line = bufReader.readLine()) != null){ 
+				    	if(writetime==0){
+			                writetime++;
+				    	}
+				    	else if(writetime==1){
+				    		writetime++;
+				    	}else{
+			                ip=line;
+				    	}
+		          }  
+
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			 
+				EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
+				WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
 			
 			//;
 			//stu._getServiceClient().sendto

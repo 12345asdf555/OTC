@@ -105,8 +105,35 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		// TODO Auto-generated method stub
 		
 		 try{
-				EndpointReference endpoint=new EndpointReference("http://192.168.3.212:8734/JN_WELD_Service/Service1/");
-				WeldServiceStub stu=new WeldServiceStub("http://192.168.3.212:8734/JN_WELD_Service/Service1/");
+			 
+			 try {
+				  FileInputStream in = new FileInputStream("IPconfig.txt");  
+		          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+		          BufferedReader bufReader = new BufferedReader(inReader);  
+		          String line = null; 
+		          int writetime=0;
+					
+				    while((line = bufReader.readLine()) != null){ 
+				    	if(writetime==0){
+			                writetime++;
+				    	}
+				    	else if(writetime==1){
+				    		writetime++;
+				    	}else{
+			                ip=line;
+				    	}
+		          }  
+
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			 
+				EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
+				WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
 				
 				//;
 				//stu._getServiceClient().sendto
@@ -203,6 +230,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	        				str1 = str1 + "0000000000000000";
 	        			}else{
 	        				String welder1 = "0000000000000000";
+	        				int count = 0;
 	        				for(int i=0;i<listarrayJN.size();i+=5){
 	        					if(weldid.equals("")){
 	        						str1 = str1 + "0000000000000000";
@@ -224,7 +252,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			                    			str1 = str1 + "0000000000000000";
 			                    		}
 				                    	break;
-			                    	}
+			                    	}else{
+			        					count++;
+			        					if(count == listarrayJN.size()/5){
+			        						str1 = str1 + "0000000000000000";
+			        						count = 0;
+			        					}
+			        				}
 	        					}
 		                    }
 	        			}
@@ -299,6 +333,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	        				str1 = str1 + "00000000";
 	        			}else{
 	        				String code = "00000000";
+	        				int counta = 0;
 	        				for(int i=0;i<listarrayJN.size();i+=5){
 	        					if(weldid.equals("")){
 	        						str1 = str1 + "00000000";
@@ -320,7 +355,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			                    			str1 = str1 + "00000000";
 			                    		}
 				                    	break;
-			                    	}
+			                    	}else{
+			        					counta++;
+			        					if(counta == listarrayJN.size()/5){
+			        						str1 = str1 + "00000000";
+			        						counta = 0;
+			        					}
+			        				}
 	        					}
 		                    }
 	        			}
@@ -359,13 +400,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		                	}
 		                }
 		                str1 = str1 + channel + "00" + "177D";
-		                dataView.append("松下:" + str1);
+		                dataView.append("松下:" + str1 + "\r\n");
 		                chcli.writeAndFlush(str1).sync();
 		            }
 		        }
 		 	} catch (Exception e) {
 				// TODO 自动生成的 catch 块
-		 		dataView.setText("服务器未开启");
+		 		dataView.setText("服务器未开启" + "\r\n");
 				e.printStackTrace();
 			}
 		}

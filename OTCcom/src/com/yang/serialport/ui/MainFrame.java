@@ -194,9 +194,9 @@ public class MainFrame extends JFrame {
 	                ip=line;
 	                writetime++;
 		    	}
-		    	else{
+		    	else if(writetime==1){
 		    		fitemid=line;
-		    		writetime=0;
+		    		writetime++;
 		    	}
             }  
 
@@ -225,7 +225,7 @@ public class MainFrame extends JFrame {
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
 		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://" + "192.168.3.162" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://" + "192.168.3.207" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
         Calendar calendarmail = Calendar.getInstance();
@@ -549,7 +549,7 @@ public class MainFrame extends JFrame {
 					// TODO Auto-generated method stub
 			    	NS.tranpan();
 				}
-			},1000,1000);
+			},5000,5000);
 			
 		}
 	};
