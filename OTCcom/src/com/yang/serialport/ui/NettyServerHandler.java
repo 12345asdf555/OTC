@@ -159,12 +159,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				ServiceCallResponse a = stu.serviceCall(sc);
 				CompositeType rs= a.getServiceCallResult();
 				String xml = rs.getWeldDataTable();
-				System.out.println(xml);
 				
 				Document doc = DocumentHelper.parseText(xml);
 				
 				Element rootElt = doc.getRootElement(); // 获取根节点
-		        System.out.println("根节点：" + rootElt.getName() + "\r");
 		
 		        List nodes = rootElt.elements("dt");
 		    	String str1 = "";
@@ -406,7 +404,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		        }
 		 	} catch (Exception e) {
 				// TODO 自动生成的 catch 块
-		 		dataView.setText("服务器未开启" + "\r\n");
+		 		dataView.setText("wcf服务器未开启" + "\r\n");
 				e.printStackTrace();
 			}
 		}
