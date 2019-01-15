@@ -489,7 +489,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			                	int gather = Integer.valueOf(str.substring(16,20), 16);
 			                	if(gather == 1 || gather == 2|| gather == 3|| gather == 4|| gather == 5|| gather == 6){
 				                	int eletric = Integer.valueOf(str.substring(56,60), 16);
-				                	if(eletric>=60 && eletric<255){
+				                	if(eletric>=30 && eletric<255){
 				                		temp = (int)((4.23*eletric-200)/10);
 				                	}
 				                	else if(eletric>=255 && eletric<300){
