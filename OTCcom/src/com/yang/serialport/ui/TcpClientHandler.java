@@ -32,7 +32,6 @@ import io.netty.util.CharsetUtil;
 import service.weld.jn.ServiceCall;
 import service.weld.jn.ServiceCallResponse;
 
-
 public class TcpClientHandler extends ChannelHandlerAdapter {
 	
 	public Clientconnect client;
