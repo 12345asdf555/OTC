@@ -225,7 +225,7 @@ public class MainFrame extends JFrame {
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
 		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://192.168.3.26:8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://192.168.3.41:8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
         Calendar calendarmail = Calendar.getInstance();
@@ -447,7 +447,7 @@ public class MainFrame extends JFrame {
  	        if(iffirst){
  	 			new Thread(work).start();
  	 			new Thread(cli).start();
- 	 			//new Thread(pan).start();
+ 	 			new Thread(pan).start();
  	 			iffirst = false;
  	        }
  	        
@@ -597,7 +597,7 @@ public class MainFrame extends JFrame {
 	                public void initChannel(SocketChannel chsoc) throws Exception {
 						synchronized (socketlist) {
 						//编码解码
-						chsoc.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 1, 0, 0));    
+						chsoc.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 1, 1, 0, 0));    
 	                	chsoc.pipeline().addLast("frameEncoder", new LengthFieldPrepender(1));
 	                	//加入编码解码之后,不能加入utf-8编码,加入之后0x80之后的数错误
 	                	//chsoc.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));    

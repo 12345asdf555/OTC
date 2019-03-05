@@ -369,6 +369,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		                	str1 = str1 + "00";
 		                }else if(state.equals("焊接")){
 		                	str1 = str1 + "03";
+		                }else{
+		                	str1 = str1 + "09";
 		                }
 		                
 		                String wd = elm.element("wd").getStringValue();   //焊丝直径
