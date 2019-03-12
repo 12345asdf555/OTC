@@ -364,11 +364,27 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		                    }
 	        			}
 		                
-		                String state = elm.element("state").getStringValue();   //焊机状态
-		                if(state.equals("待机")){
-		                	str1 = str1 + "00";
-		                }else if(state.equals("焊接")){
-		                	str1 = str1 + "03";
+		                String statewarn = elm.element("wawv_alter").getStringValue();   //焊机报警状态判断
+		                if(statewarn.equals("0")){
+			                String state = elm.element("state").getStringValue();   //焊机状态
+			                if(state.equals("待机")){
+			                	str1 = str1 + "00";
+			                }else if(state.equals("焊接")){
+			                	str1 = str1 + "03";
+			                }else {
+			                	str1 = str1 + "00";
+			                }
+		                }else if(statewarn.equals("1")){
+		                	str1 = str1 + "63";
+		                }else{
+		                	String state = elm.element("state").getStringValue();   //焊机状态
+			                if(state.equals("待机")){
+			                	str1 = str1 + "00";
+			                }else if(state.equals("焊接")){
+			                	str1 = str1 + "03";
+			                }else {
+			                	str1 = str1 + "00";
+			                }
 		                }
 		                
 		                String wd = elm.element("wd").getStringValue();   //焊丝直径
@@ -386,9 +402,68 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		                	str1 = str1 + "0E";
 		                }else if(wd.equals("1.6")){
 		                	str1 = str1 + "10";
+		                }else {
+		                	str1 = str1 + "10";
 		                }
 		                
-		                str1 = str1 + "010000000000000000";
+		                int va_up = Integer.parseInt(elm.element("va_up").getStringValue()); //电流上限
+		                int vv_up = (int) (Double.valueOf(elm.element("vv_up").getStringValue())*10); //电压上限
+	                    int va_down = Integer.parseInt(elm.element("va_down").getStringValue()); //电流下限
+	                    int vv_down = (int) (Double.valueOf(elm.element("vv_down").getStringValue())*10); //电压下限
+	                    
+	                    if(va_down>va_up){
+	                    	str1 = str1 + "010000";
+	                    }else{
+	                    	String vaset = Integer.toHexString((va_up+va_down)/2);
+			                if(vaset.length()<4){
+			                	int len = 4 - vaset.length();
+			                	for(int i=0;i<len;i++){
+			                		vaset = "0" + vaset;
+			                	}
+			                }
+	                    	str1 = str1 + "01" + vaset;
+	                    }
+		                
+	                    if(vv_down>vv_up){
+	                    	str1 = str1 + "0000";
+	                    }else{
+	                    	String vvset = Integer.toHexString((vv_up+vv_down)/2);
+			                if(vvset.length()<4){
+			                	int len = 4 - vvset.length();
+			                	for(int i=0;i<len;i++){
+			                		vvset = "0" + vvset;
+			                	}
+			                }
+	                    	str1 = str1 + vvset;
+	                    }
+	                    
+	                    if(va_down>va_up){
+	                    	str1 = str1 + "00";
+	                    }else{
+	                    	String vaset = Integer.toHexString((va_up-va_down)/2);
+			                if(vaset.length()<2){
+			                	int len = 2 - vaset.length();
+			                	for(int i=0;i<len;i++){
+			                		vaset = "0" + vaset;
+			                	}
+			                }
+	                    	str1 = str1 + vaset;
+	                    }
+		                
+	                    if(vv_down>vv_up){
+	                    	str1 = str1 + "00";
+	                    }else{
+	                    	String vvset = Integer.toHexString((vv_up-vv_down)/2);
+			                if(vvset.length()<2){
+			                	int len = 2 - vvset.length();
+			                	for(int i=0;i<len;i++){
+			                		vvset = "0" + vvset;
+			                	}
+			                }
+	                    	str1 = str1 + vvset;
+	                    }
+	                    
+                    	str1 = str1 + "0000";
 		                
 		                String channel = Integer.toHexString(Integer.valueOf(elm.element("channel").getStringValue())); //通道
 		                if(channel.length()<2){
@@ -397,7 +472,38 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		                		channel = "0" + channel;
 		                	}
 		                }
-		                str1 = str1 + channel + "00" + "177D";
+		                str1 = str1 + channel;
+		                
+		                String wa_up = Integer.toHexString(Integer.valueOf(elm.element("wa_up").getStringValue())); //报警电流上限
+		                if(wa_up.length()<4){
+		                	int len = 4 - wa_up.length();
+		                	for(int i=0;i<len;i++){
+		                		wa_up = "0" + wa_up;
+		                	}
+		                }
+		                String wv_up = Integer.toHexString((int)(Double.valueOf(elm.element("wv_up").getStringValue())*10)); //报警电压上限
+		                if(wv_up.length()<4){
+		                	int len = 4 - wv_up.length();
+		                	for(int i=0;i<len;i++){
+		                		wv_up = "0" + wv_up;
+		                	}
+		                }
+	                    String wa_down = Integer.toHexString(Integer.parseInt(elm.element("wa_down").getStringValue())); //报警电流下限
+	                    if(wa_down.length()<4){
+		                	int len = 4 - wa_down.length();
+		                	for(int i=0;i<len;i++){
+		                		wa_down = "0" + wa_down;
+		                	}
+		                }
+	                    String wv_down = Integer.toHexString((int)(Double.valueOf(elm.element("wv_down").getStringValue())*10)); //报警电压下限
+	                    if(wv_down.length()<4){
+		                	int len = 4 - wv_down.length();
+		                	for(int i=0;i<len;i++){
+		                		wv_down = "0" + wv_down;
+		                	}
+		                }
+	                    
+		                str1 = str1 + wa_up + wv_up + wa_down + wv_down + "00" + "177D";
 		                dataView.append("松下:" + str1 + "\r\n");
 		                chcli.writeAndFlush(str1).sync();
 		            }
@@ -447,12 +553,12 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				  
 				  if(str.length()>=6){
 					  
-					  if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22")) && str.length()==234){
+					  if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22")) && str.length()==282){
 						  
 						  str = trans(str); //融合有无任务模式
 						  //str = transOTC(str);
 						  //str = transJN(str);
-						  str=str.substring(0,232)+fitemid+"7D";
+						  str=str.substring(0,280)+fitemid+"7D";
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
@@ -502,15 +608,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		private String trans(String str) {
 			// TODO Auto-generated method stub
 			
-			if (str.length() == 234) {
+			if (str.length() == 282) {
 				
 				//校验第一位是否为FA末位是否为F5
 	      	    String check1 =str.substring(0,2);
-	      	    String check11=str.substring(232,234);
+	      	    String check11=str.substring(280,282);
 	      	    if(check1.equals("7E") && check11.equals("7D")){
 
 	      	    	//校验位校验
-	          	    String check3=str.substring(0,230);
+	          	    String check3=str.substring(0,278);
 	          	    String check5="";
 	          	    int check4=0;
 	          	    for (int i11 = 0; i11 < check3.length()/2; i11++)
@@ -523,7 +629,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	          	    }else{
 	          	    	check5 = ((Integer.toHexString(check4)).toUpperCase()).substring(2,4);
 	          	    }
-	          	    String check6 = str.substring(230,232);
+	          	    String check6 = str.substring(278,280);
 	          	    if(check5.equals(check6)){
 	          	    	
 	          	    	StringBuilder sb = new StringBuilder(str);
@@ -531,8 +637,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	        			String weld = str.substring(14, 18);
 	        			String welder = str.substring(34, 38);
 	        			String junction1 = str.substring(70, 78);
-	        			String junction2 = str.substring(134, 142);
-	        			String junction3 = str.substring(198, 206);
+	        			String junction2 = str.substring(150, 158);
+	        			String junction3 = str.substring(230, 238);
 	        			
 	        			//江南任务模式
 	        			if(Integer.parseInt(welder,16)==0 && Integer.parseInt(junction1,16)==0 && Integer.parseInt(junction2,16)==0 && Integer.parseInt(junction3,16)==0){
@@ -583,13 +689,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		        			if(listarrayJN.size()==0){
 		        				sb.replace(34, 38, "0000");
 		        				sb.replace(70, 78, "00000000");
-		        				sb.replace(134, 142, "00000000");
-		        				sb.replace(198, 206, "00000000");
+		        				sb.replace(150, 158, "00000000");
+		        				sb.replace(230, 238, "00000000");
 		        			}else{
 		        				sb.replace(34, 38, "0000");
 		        				sb.replace(70, 78, "00000000");
-		        				sb.replace(134, 142, "00000000");
-		        				sb.replace(198, 206, "00000000");
+		        				sb.replace(150, 158, "00000000");
+		        				sb.replace(230, 238, "00000000");
 		        				String welder1 = "0000";
 		        				String code = "00000000";
 		        				for(int i=0;i<listarrayJN.size();i+=5){
@@ -629,8 +735,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			                    }
 		        				sb.replace(34, 38, welder1);
 		        				sb.replace(70, 78, code);
-		        				sb.replace(134, 142, code);
-		        				sb.replace(198, 206, code);
+		        				sb.replace(150, 158, code);
+		        				sb.replace(230, 238, code);
 		        			}
 		        			
 		        			str = sb.toString();
