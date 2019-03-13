@@ -224,8 +224,8 @@ public class MainFrame extends JFrame {
 		//webservice配置
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
-		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://192.168.3.26:8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		//client = dcf.createClient("http://192.168.3.26:8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
         Calendar calendarmail = Calendar.getInstance();
@@ -447,7 +447,7 @@ public class MainFrame extends JFrame {
  	        if(iffirst){
  	 			new Thread(work).start();
  	 			new Thread(cli).start();
- 	 			//new Thread(pan).start();
+ 	 			new Thread(pan).start();
  	 			iffirst = false;
  	        }
  	        

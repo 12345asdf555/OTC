@@ -594,7 +594,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
             }
             ctx.writeAndFlush(str1).sync();
             String docXmlText=doc.asXML();
-            System.out.println(docXmlText); 
+            //System.out.println(docXmlText); 
             
 			//String a = sc.getOMElement("509201", null);
 			//System.out.println(a);
@@ -610,8 +610,35 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 		//调用wcf连接服务器
 		
 		try {
-			EndpointReference endpoint=new EndpointReference("http://192.168.3.212:8734/JN_WELD_Service/Service1/");
-			WeldServiceStub stu=new WeldServiceStub("http://192.168.3.212:8734/JN_WELD_Service/Service1/");
+			String ip = "";
+			try {
+				  FileInputStream in = new FileInputStream("IPconfig.txt");  
+		          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+		          BufferedReader bufReader = new BufferedReader(inReader);  
+		          String line = null; 
+		          int writetime=0;
+					
+				    while((line = bufReader.readLine()) != null){ 
+				    	if(writetime==0){
+			                writetime++;
+				    	}
+				    	else if(writetime==1){
+				    		writetime++;
+				    	}else{
+			                ip=line;
+				    	}
+		          }  
+	
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 
+			EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
+			WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
 			
 			//;
 			//stu._getServiceClient().sendto
@@ -637,12 +664,12 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			ServiceCallResponse a = stu.serviceCall(sc);
 			CompositeType rs= a.getServiceCallResult();
 			String xml = rs.getWeldDataTable();
-			System.out.println(xml);
+			//System.out.println(xml);
 			
 			Document doc = DocumentHelper.parseText(xml);
 			
 			Element rootElt = doc.getRootElement(); // 获取根节点
-            System.out.println("根节点：" + rootElt.getName() + "\r");
+            //System.out.println("根节点：" + rootElt.getName() + "\r");
 
             String[] headbuf = xml.split("<dt>");
             String head = headbuf[0];
@@ -657,14 +684,14 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
                 Element elmbuf1 = elm.element("nom");
                 Element elmbuf2 = elm.element("channel");
                 
-                System.out.println(Integer.valueOf(elmbuf1.getStringValue()));
-                System.out.println(Integer.valueOf(elmbuf2.getStringValue()));
-                System.out.println(Integer.valueOf(str.substring(10,14),16));
-                System.out.println(Integer.valueOf(str.substring(46,48),16));
+                //System.out.println(Integer.valueOf(elmbuf1.getStringValue()));
+                //System.out.println(Integer.valueOf(elmbuf2.getStringValue()));
+                //System.out.println(Integer.valueOf(str.substring(10,14),16));
+                //System.out.println(Integer.valueOf(str.substring(46,48),16));
                 
                 if((Integer.valueOf(elmbuf1.getStringValue()).equals(Integer.valueOf(str.substring(10,14),16))) && (Integer.valueOf(elmbuf2.getStringValue()).equals(Integer.valueOf(str.substring(46,48),16)))){
-                	System.out.println(elmbuf1.getStringValue()); 
-                    System.out.println("节点：" + elm.getName() + "\r");
+                	//System.out.println(elmbuf1.getStringValue()); 
+                    //System.out.println("节点：" + elm.getName() + "\r");
                     
                     /*Element channel = elm.element("channel");E
                     channel.setText(Integer.valueOf(str.substring(46,48),16).toString());*/
@@ -772,7 +799,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
                     AlarmType.setText(Integer.valueOf(str.substring(206,208),16).toString());
                     
                     docXmlText=doc.asXML();
-                    System.out.println(docXmlText);  
+                    //System.out.println(docXmlText);  
                     
                   
                     break;
@@ -797,7 +824,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			a = stu.serviceCall(sc);
 			rs= a.getServiceCallResult();
 			xml = rs.getWeldDataTable();
-			System.out.println(xml);
+			//System.out.println(xml);
             
 			ctx.writeAndFlush("FE5AA5001A"+str.substring(10,14)+"00000000000000000000000000021102"+str.substring(46,48)+"0000").sync();
 			
