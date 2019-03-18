@@ -210,16 +210,17 @@ public class MainFrame extends JFrame {
 		initView();
 		initComponents();
 		
-
+		new Thread(work).start();
+		new Thread(cli).start();
+		
 		//webservice配置
-		iutil  =  new IsnullUtil();
+		/*iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
 		client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		//client = dcf.createClient("http://" + "192.168.3.26" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		iutil.Authority(client);
+		iutil.Authority(client);*/
 		
 		//功能实现线程
-		Timer tExit1 = null; 
+		/*Timer tExit1 = null; 
 		tExit1 = new Timer();  
         tExit1.schedule(new TimerTask() {
 			@Override  
@@ -228,7 +229,7 @@ public class MainFrame extends JFrame {
 			}  
         }, 3600000,3600000);
         
-        ser();
+        ser();*/
 		
 		NS.dataView = this.dataView;
 	}
