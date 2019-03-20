@@ -447,7 +447,7 @@ public class MainFrame extends JFrame {
  	        if(iffirst){
  	 			new Thread(work).start();
  	 			new Thread(cli).start();
- 	 			new Thread(pan).start();
+ 	 			//new Thread(pan).start();
  	 			iffirst = false;
  	        }
  	        
