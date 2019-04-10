@@ -131,7 +131,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 					}
 	             	
 	         	}catch (Exception e) {
-	         		client.mainFrame.DateView("数据接收错误" + "\r\n");
+	         		//client.mainFrame.DateView("数据接收错误" + "\r\n");
 					//webiter = socketlist.entrySet().iterator();
 				}
 	         }

@@ -72,7 +72,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		     Workspace ws = new Workspace(req);
 	         workThread = new Thread(ws);  
 	         workThread.start();
-	         
+		     
 	         //ReferenceCountUtil.release(msg);
 			 ReferenceCountUtil.release(req);
 			 ReferenceCountUtil.release(buf);
@@ -940,6 +940,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
      @Override  
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {  
     	 cause.printStackTrace();
+    	 System.out.println(ctx);
          ctx.close();  
      } 
 	 
