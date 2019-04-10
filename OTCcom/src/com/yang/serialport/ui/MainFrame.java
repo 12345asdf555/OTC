@@ -447,7 +447,7 @@ public class MainFrame extends JFrame {
  	        if(iffirst){
  	 			new Thread(work).start();
  	 			new Thread(cli).start();
- 	 			//new Thread(pan).start();
+ 	 			new Thread(pan).start();
  	 			iffirst = false;
  	        }
  	        
@@ -477,7 +477,8 @@ public class MainFrame extends JFrame {
 	//界面布局
 	public void initComponents() {
 		// 数据显示
-		dataView.setFocusable(false);
+		//dataView.setFocusable(false);
+		dataView.setEditable(false);
 		dataView.getDocument().addDocumentListener(new DocumentListener(){
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -548,7 +549,7 @@ public class MainFrame extends JFrame {
 					// TODO Auto-generated method stub
 			    	NS.tranpan();
 				}
-			},1000,1000);
+			},1001,1001);
 			
 		}
 	};

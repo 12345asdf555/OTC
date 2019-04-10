@@ -307,7 +307,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		                str1 = str1 + year + month + day + hour + minute + second;
 	        			
 		                
-		                String va = Integer.toHexString(Integer.valueOf(elm.element("va").getStringValue())); //电流
+		                String va = Integer.toHexString(Integer.valueOf(elm.element("wa").getStringValue())); //电流
 		                if(va.length()<4){
 		                	int len = 4 - va.length();
 		                	for(int i=0;i<len;i++){
@@ -317,7 +317,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		                str1 = str1 + va;
 		                
 		                
-		                String vv = Integer.toHexString((int) (Double.valueOf(elm.element("vv").getStringValue())*10)); //电压
+		                String vv = Integer.toHexString((int) (Double.valueOf(elm.element("wv").getStringValue())*10)); //电压
 		                if(vv.length()<4){
 		                	int len = 4 - vv.length();
 		                	for(int i=0;i<len;i++){
