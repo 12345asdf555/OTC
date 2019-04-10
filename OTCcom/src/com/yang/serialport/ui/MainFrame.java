@@ -108,7 +108,7 @@ import org.apache.cxf.endpoint.Client;
 
 import com.yang.serialport.ui.*;
 
-public class MainFrame extends JFrame {
+public class MainFrame {
 	 
 	Connection c = null;
     Statement stmt = null;
@@ -207,8 +207,8 @@ public class MainFrame extends JFrame {
 		NS.fitemid = fitemid;
 		
 		//加载界面布局
-		initView();
-		initComponents();
+		//initView();
+		//initComponents();
 		
 
 		//webservice配置
@@ -429,13 +429,13 @@ public class MainFrame extends JFrame {
  	        
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			dataView.append("Webservice未开启" + "\r\n");
+			System.out.println("Webservice未开启" + "\r\n");
 			e.printStackTrace();
 		}			
 	}
 
 	//界面布局
-	public void initView() {
+	/*public void initView() {
 		// 关闭程序
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		// 禁止窗口最大化
@@ -448,12 +448,13 @@ public class MainFrame extends JFrame {
 		this.setLayout(null);
 
 		setTitle("Wifi采集器");
-	}
+	}*/
 
 	//界面布局
-	public void initComponents() {
+	/*public void initComponents() {
 		// 数据显示
-		dataView.setFocusable(false);
+		//dataView.setFocusable(false);
+		dataView.setEditable(false);
 		dataView.getDocument().addDocumentListener(new DocumentListener(){
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -509,7 +510,7 @@ public class MainFrame extends JFrame {
 
 		sendData.setFocusable(false);
 		sendData.setBounds(70, 40, 90, 30);
-	}
+	}*/
 	
 	//socket连接服务器
 	public Runnable cli =new Runnable(){
@@ -588,12 +589,13 @@ public class MainFrame extends JFrame {
 	};
 	
 	public static void main(String args[]) {
-		new MainFrame().setVisible(true);
+		//new MainFrame().setVisible(true);
+		new MainFrame();
 	}
 	
 	public void DateView(String datesend) {
 		// TODO Auto-generated method stub
-		dataView.append(datesend + "\r\n");
+		System.out.println(datesend + "\r\n");
 		
 	}
 		
@@ -703,7 +705,7 @@ public class MainFrame extends JFrame {
 			        
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				dataView.append("Webservice未开启" + "\r\n");
+				System.out.println("Webservice未开启" + "\r\n");
 				e.printStackTrace();
 			}		
 		}
