@@ -549,7 +549,7 @@ public class MainFrame extends JFrame {
 					// TODO Auto-generated method stub
 			    	NS.tranpan();
 				}
-			},1001,1001);
+			},3001,3001);
 			
 		}
 	};

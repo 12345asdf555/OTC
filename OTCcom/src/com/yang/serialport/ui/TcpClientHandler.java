@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -174,6 +175,10 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 	
 	private void wcfget(String str, ChannelHandlerContext ctx) {
 		// TODO Auto-generated method stub
+		
+		Date dt1 = new Date();
+		System.out.println("索取开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt1));
+		
 		try {
 			String ip = "";
 			try {
@@ -202,6 +207,9 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 					e.printStackTrace();
 				}
 			 
+			Date dt2 = new Date();
+			System.out.println("索取wcf获取方式开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2));
+			
 				EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
 				WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
 			
@@ -229,6 +237,9 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			ServiceCallResponse a = stu.serviceCall(sc);
 			CompositeType rs= a.getServiceCallResult();
 			String xml = rs.getWeldDataTable();
+			
+			Date dt3 = new Date();
+			System.out.println("索取wcf获取方式结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3));
 			
 			Document doc = DocumentHelper.parseText(xml);
 			
@@ -593,7 +604,9 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
                 }
             }
             ctx.writeAndFlush(str1).sync();
-            String docXmlText=doc.asXML();
+            
+            Date dt4 = new Date();
+    		System.out.println("索取结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt4));
             //System.out.println(docXmlText); 
             
 			//String a = sc.getOMElement("509201", null);
@@ -608,6 +621,8 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 		// TODO Auto-generated method stub
 		
 		//调用wcf连接服务器
+		Date dt1 = new Date();
+		System.out.println("下发开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt1));
 		
 		try {
 			String ip = "";
@@ -637,6 +652,9 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 				e.printStackTrace();
 			}
 		 
+			Date dt2 = new Date();
+			System.out.println("下发wcf获取方式开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2));
+			
 			EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
 			WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
 			
@@ -665,6 +683,9 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			CompositeType rs= a.getServiceCallResult();
 			String xml = rs.getWeldDataTable();
 			//System.out.println(xml);
+			
+			Date dt3 = new Date();
+			System.out.println("下发wcf获取方式结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3));
 			
 			Document doc = DocumentHelper.parseText(xml);
 			
@@ -816,6 +837,8 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
             String data = databuf[count];
             count = 0;
             
+            Date dt4 = new Date();
+    		System.out.println("下发wcf下发方法开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt4));
             
             tt.setWeldDataTable(head+"<dt>"+data+"</NewDataSet>");
 			tt.setCmdCode(6032801); //下发参数
@@ -826,7 +849,13 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			xml = rs.getWeldDataTable();
 			//System.out.println(xml);
             
+			Date dt5 = new Date();
+    		System.out.println("下发wcf下发方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt5));
+			
 			ctx.writeAndFlush("FE5AA5001A"+str.substring(10,14)+"00000000000000000000000000021102"+str.substring(46,48)+"0000").sync();
+			
+			Date dt6 = new Date();
+			System.out.println("下发结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt6));
 			
 			//String a = sc.getOMElement("509201", null);
 			//System.out.println(a);
