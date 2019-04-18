@@ -453,7 +453,8 @@ public class MainFrame extends JFrame {
 	//界面布局
 	public void initComponents() {
 		// 数据显示
-		dataView.setFocusable(false);
+		//dataView.setFocusable(false);
+		dataView.setEditable(false);
 		dataView.getDocument().addDocumentListener(new DocumentListener(){
 			@Override
 			public void insertUpdate(DocumentEvent e) {
