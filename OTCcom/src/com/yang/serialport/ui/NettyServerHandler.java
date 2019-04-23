@@ -138,7 +138,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					         dataView.append(" " + str + "\r\n");
 				          }catch(Exception ex){
 							 ex.printStackTrace();
-				 			 dataView.setText("服务器未开启" + "\r\n");
+					         dataView.append(" " + str + "\r\n");
+				 			 //dataView.setText("服务器未开启" + "\r\n");
 				          }
 				          
 				          str = "";
