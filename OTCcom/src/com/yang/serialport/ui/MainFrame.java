@@ -549,7 +549,7 @@ public class MainFrame extends JFrame {
 					// TODO Auto-generated method stub
 			    	NS.tranpan();
 				}
-			},3001,3001);
+			},6001,6001);
 			
 		}
 	};
@@ -568,8 +568,7 @@ public class MainFrame extends JFrame {
 	 			 ex.printStackTrace();
 	         }
 		}
-	};
-	
+	};        	
 	//点击事件关闭界面
 	private void closeSerialPort(java.awt.event.ActionEvent evt) {
 		System.exit(0);

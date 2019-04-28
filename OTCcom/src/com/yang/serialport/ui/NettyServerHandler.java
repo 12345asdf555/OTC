@@ -534,10 +534,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
+	    	int count1 = 0;
+	    	Date dt1 = null;
+	    	Date dt2 = null;
+	    	Date dt3 = null;
 			try{
-				 
-				Date dt1 = new Date();
-				dataView.append("实时开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt1) + "\r\n");
+
+				dt1 = new Date();
 				 
 				 try {
 					  FileInputStream in = new FileInputStream("IPconfig.txt");  
@@ -566,8 +569,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					}
 				 
 
-					Date dt2 = new Date();
-					dataView.append("实时调用wcf方法开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2) + "\r\n");
+					dt2 = new Date();
 					EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
 					WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
 					
@@ -596,8 +598,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					CompositeType rs= a.getServiceCallResult();
 					String xml = rs.getWeldDataTable();
 					
-					Date dt3 = new Date();
-					dataView.append("实时调用wcf方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3) + "\r\n");
+					dt3 = new Date();
 					
 					Document doc = DocumentHelper.parseText(xml);
 					
@@ -606,6 +607,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			        List nodes = rootElt.elements("dt");
 			    	String str1 = "";
 			        for (Iterator it = nodes.iterator(); it.hasNext();) {
+			        	count1++;
 			            Element elm = (Element) it.next();
 			            
 			            Element elmbuf1 = elm.element("state");
@@ -955,6 +957,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				}
 			 
 			Date dt4 = new Date();
+			dataView.append("实时开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt1) + "\r\n");
+			dataView.append("实时调用wcf方法开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2) + "\r\n");
+			dataView.append("实时调用wcf方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3) + "\r\n");
+			dataView.append("数据条数："+ Integer.toString(count1) + "\r\n");
 			dataView.append("实时结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt4) + "\r\n");
 			dataView.append("\r\n");
 		}
