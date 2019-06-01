@@ -50,6 +50,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -113,6 +114,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.sqlite.*;
 import org.tempuri.WeldServiceStub;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.cxf.endpoint.Client;
@@ -138,6 +140,9 @@ public class MainFrame extends JFrame {
     public TcpClientHandler TC = new TcpClientHandler();
     public HashMap<String, SocketChannel> socketlist = new HashMap();
     public int socketcount=0;
+    public WeldServiceStub stu = null;
+    public HashMap<String, String> hm;
+    public int wpscount = 1;
 
 	/**
 	 * 程序界面宽度
@@ -220,12 +225,12 @@ public class MainFrame extends JFrame {
 		//加载界面布局
 		initView();
 		initComponents();
-		
+		 
 		//webservice配置
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
-		client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		//client = dcf.createClient("http://192.168.3.26:8080/CIWJN_Service/cIWJNWebService?wsdl");
+		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://10.30.8.130:8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
         Calendar calendarmail = Calendar.getInstance();
@@ -542,15 +547,141 @@ public class MainFrame extends JFrame {
 		public void run() {
 			// TODO Auto-generated method stub
 			
+			String ip = "";
+			
+			try {
+				  FileInputStream in = new FileInputStream("IPconfig.txt");  
+		          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+		          BufferedReader bufReader = new BufferedReader(inReader);  
+		          String line = null; 
+		          int writetime=0;
+					
+				    while((line = bufReader.readLine()) != null){ 
+				    	if(writetime==0){
+			                writetime++;
+				    	}
+				    	else if(writetime==1){
+				    		writetime++;
+				    	}else{
+			                ip=line;
+				    	}
+		          }  
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				stu = new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
+		        stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
+		        stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制
+			} catch (AxisFault e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			hm = weldwps(stu);
+			
 			Timer t = new Timer();
 			t.schedule(new TimerTask() {
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-			    	NS.tranpan();
+			    	wpscount++;
+			    	if(wpscount==30){
+			    		hm = weldwps(stu);
+			    		wpscount=1;
+			    	}
+			    	NS.tranpan(stu,hm);
 				}
-			},6001,6001);
+			},1000,1000);
 			
+		}
+
+		private HashMap<String, String> weldwps(WeldServiceStub stu) {
+			// TODO Auto-generated method stub
+			HashMap<String, String> hm = new HashMap<String, String>();
+			try {
+				ServiceCall sc = new ServiceCall();
+				CompositeType tt=new CompositeType();
+				tt.setWeldDataTable("");
+				tt.setCmdCode(603220102);
+				sc.setCmd(tt);
+				
+				ServiceCallResponse a = stu.serviceCall(sc);
+				CompositeType rs= a.getServiceCallResult();
+				String xml = rs.getWeldDataTable();
+				
+				Document doc = DocumentHelper.parseText(xml);
+				Element rootElt = doc.getRootElement(); // 获取根节点
+		        List nodes = rootElt.elements("dt");
+		        for (Iterator it = nodes.iterator(); it.hasNext();) {
+		        	Element elm = (Element) it.next();
+		        	
+		        	String nom = Integer.toHexString(Integer.valueOf(elm.element("nom").getStringValue())); //设备编号
+	                if(nom.length()<4){
+	                	int len = 4 - nom.length();
+	                	for(int i=0;i<len;i++){
+	                		nom = "0" + nom;
+	                	}
+	                }
+		        	
+	                String channel = Integer.toHexString(Integer.valueOf(elm.element("channel").getStringValue())); //通道
+	                if(channel.length()<2){
+	                	int len = 2 - channel.length();
+	                	for(int i=0;i<len;i++){
+	                		channel = "0" + channel;
+	                	}
+	                }
+	                
+		        	String wa_up = Integer.toString(Integer.valueOf(elm.element("wa_up").getStringValue())); //报警电流上限
+	                if(wa_up.length()<4){
+	                	int len = 4 - wa_up.length();
+	                	for(int i=0;i<len;i++){
+	                		wa_up = "0" + wa_up;
+	                	}
+	                }
+	                
+	                String wa_down = Integer.toString(Integer.valueOf(elm.element("wa_down").getStringValue())); //报警电流下限
+	                if(wa_down.length()<4){
+	                	int len = 4 - wa_down.length();
+	                	for(int i=0;i<len;i++){
+	                		wa_down = "0" + wa_down;
+	                	}
+	                }
+	                
+	                String wv_up = Integer.toString((int) (Double.valueOf(elm.element("wv_up").getStringValue())*10)); //报警电压上限
+	                if(wv_up.length()<4){
+	                	int len = 4 - wv_up.length();
+	                	for(int i=0;i<len;i++){
+	                		wv_up = "0" + wv_up;
+	                	}
+	                }
+	                
+	                String wv_down = Integer.toString((int) (Double.valueOf(elm.element("wv_down").getStringValue())*10)); //报警电压下限
+	                if(wv_down.length()<4){
+	                	int len = 4 - wv_down.length();
+	                	for(int i=0;i<len;i++){
+	                		wv_down = "0" + wv_down;
+	                	}
+	                }
+	                
+	                String va_up = Integer.toString(Integer.valueOf(elm.element("va_up").getStringValue())); //电流上限
+	                String va_down = Integer.toString(Integer.valueOf(elm.element("va_down").getStringValue())); //电流下限
+	                String vv_up = Integer.toString((int) (Double.valueOf(elm.element("vv_up").getStringValue())*10)); //电压上限
+	                String vv_down = Integer.toString((int) (Double.valueOf(elm.element("vv_down").getStringValue())*10)); //电压下限
+	                
+	                hm.put(nom+":"+channel, wa_up+","+wa_down+","+wv_up+","+wv_down+","+va_up+","+va_down+","+vv_up+","+vv_down);
+		        }
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return hm;
 		}
 	};
 	

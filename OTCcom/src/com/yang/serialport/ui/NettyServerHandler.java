@@ -75,6 +75,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	public long timetran3;
 	public Date time33;
 	public int pantime = 1;
+	public WeldServiceStub stu;
+	public HashMap<String, String> hm;
+	
+	private boolean first1 = true;
 	
 	 public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		 ByteBuf buf = null;
@@ -542,7 +546,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 
 				dt1 = new Date();
 				 
-				 try {
+				 //old
+				 /*try {
 					  FileInputStream in = new FileInputStream("IPconfig.txt");  
 			          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
 			          BufferedReader bufReader = new BufferedReader(inReader);  
@@ -567,13 +572,17 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
+					WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
+			        stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
+			        stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制*/
+					
 				 
 
-					dt2 = new Date();
-					EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
-					WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
+					//dt2 = new Date();
+					//EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
 					
-					//;
+					
 					//stu._getServiceClient().sendto
 					//stu._getServiceClient().setTargetEPR(endpoint);~
 					//stu._getServiceClient().getOptions().setTo(endpoint);;
@@ -582,12 +591,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					//stu._getServiceClient().getOptions().setProperty(AddressingConstants., org.apache.axis2.addressing.AddressingConstants.Final.WSA_NAMESPACE);
 			        //int setWebServiceTimeOutInSeconds=mySession.getVariable(IProjectVariables.SET_WEB_SERVICE_TIME_OUT_IN_SECONDS).getSimpleVariable().getIntValue();
 			        //stu._getServiceClient().getOptions().setTimeOutInMilliSeconds(setWebServiceTimeOutInSeconds*1000);
-			        stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
-			        stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制.
 					
-					//stu._getServiceClient().
 					
 					ServiceCall sc = new ServiceCall();
+					
 					CompositeType tt=new CompositeType();
 					tt.setWeldDataTable("");
 					tt.setCmdCode(603220101);
@@ -598,7 +605,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					CompositeType rs= a.getServiceCallResult();
 					String xml = rs.getWeldDataTable();
 					
-					dt3 = new Date();
+					//dt3 = new Date();
 					
 					Document doc = DocumentHelper.parseText(xml);
 					
@@ -701,53 +708,59 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		        					}
 			                    }
 		        			}
-			                
-		        			Calendar ad = Calendar.getInstance();             //时间
-		        			String year = Integer.toHexString(ad.get(Calendar.YEAR)-2000);
-		        			if(year.length()<2){
+
+	        				String time = elm.element("nowtime").getStringValue(); //时间
+	        				if(first1){
+	        					System.out.println("Yes:" + time);
+	        					first1 = false;
+	        				}
+	        				String[] timebuf1 = time.split("/");
+	        				String[] timebuf2 = timebuf1[2].split(" ");
+	        				String[] timebuf3 = timebuf2[1].split(":");
+	        				String year = Integer.toHexString(Integer.valueOf(timebuf1[0].substring(2, 4)));
+	        				if(year.length()<2){
 			                	int len = 2 - year.length();
 			                	for(int i=0;i<len;i++){
 			                		year = "0" + year;
 			                	}
 			                }
-		        			String month = Integer.toHexString(ad.get(Calendar.MONTH)+1);
+	        				String month = Integer.toHexString(Integer.valueOf(timebuf1[1]));
 		        			if(month.length()<2){
 			                	int len = 2 - month.length();
 			                	for(int i=0;i<len;i++){
 			                		month = "0" + month;
 			                	}
 			                }
-		        			String day = Integer.toHexString(ad.get(Calendar.DAY_OF_MONTH));
+		        			String day = Integer.toHexString(Integer.valueOf(timebuf2[0]));
 		        			if(day.length()<2){
 			                	int len = 2 - day.length();
 			                	for(int i=0;i<len;i++){
 			                		day = "0" + day;
 			                	}
 			                }
-		        			String hour = Integer.toHexString(ad.get(Calendar.HOUR_OF_DAY));
+		        			String hour = Integer.toHexString(Integer.valueOf(timebuf3[0]));
 		        			if(hour.length()<2){
 			                	int len = 2 - hour.length();
 			                	for(int i=0;i<len;i++){
 			                		hour = "0" + hour;
 			                	}
 			                }
-		        			String minute = Integer.toHexString(ad.get(Calendar.MINUTE));
+		        			String minute = Integer.toHexString(Integer.valueOf(timebuf3[1]));
 		        			if(minute.length()<2){
 			                	int len = 2 - minute.length();
 			                	for(int i=0;i<len;i++){
 			                		minute = "0" + minute;
 			                	}
 			                }
-		        			String second = Integer.toHexString(ad.get(Calendar.SECOND));
+		        			String second = Integer.toHexString(Integer.valueOf(timebuf3[2]));
 		        			if(second.length()<2){
 			                	int len = 2 - second.length();
 			                	for(int i=0;i<len;i++){
 			                		second = "0" + second;
 			                	}
 			                }
-			                str1 = str1 + year + month + day + hour + minute + second;
+	        				str1 = str1 + year + month + day + hour + minute + second;
 		        			
-			                
 			                String va = Integer.toHexString(Integer.valueOf(elm.element("wa").getStringValue())); //电流
 			                if(va.length()<4){
 			                	int len = 4 - va.length();
@@ -806,7 +819,44 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 		        			}
 			                
 			                String statewarn = elm.element("wawv_alter").getStringValue();   //焊机报警状态判断
-			                if(statewarn.equals("0")){
+			                String state = elm.element("state").getStringValue();   //焊机状态
+			                
+		                	String channelbuf = Integer.toHexString(Integer.valueOf(elm.element("channel").getStringValue())); //通道
+			                if(channelbuf.length()<2){
+			                	int len = 2 - channelbuf.length();
+			                	for(int i=0;i<len;i++){
+			                		channelbuf = "0" + channelbuf;
+			                	}
+			                }
+			                String wps = hm.get(nom+":"+channelbuf);
+			                String[] wpsde = null;
+			                if(wps != null){
+			                	wpsde = wps.split(",");;//判断焊机通道是否报警
+			                }
+			                
+			                //判断焊机报警
+			                if(state.equals("待机")){
+			                	str1 = str1 + "00";
+			                	//System.out.println("status:"+"00 "+"va:"+Integer.valueOf(va,16)+" vv:"+Integer.valueOf(vv,16)+" wpf:"+wps);
+			                }else if(state.equals("焊接")){
+			                	if(wpsde != null){
+			                		if(Integer.valueOf(va,16)>Integer.valueOf(wpsde[0]) || Integer.valueOf(va,16)<Integer.valueOf(wpsde[1]) || Integer.valueOf(vv,16)>Integer.valueOf(wpsde[2]) || Integer.valueOf(vv,16)<Integer.valueOf(wpsde[3])){
+					                	str1 = str1 + "63";
+						                //System.out.println("status:"+"99 "+"va:"+Integer.valueOf(va,16)+" vv:"+Integer.valueOf(vv,16)+" wpf:"+wps);
+					                }else{
+					                	str1 = str1 + "03";
+					                	//System.out.println("status:"+"03 "+"va:"+Integer.valueOf(va,16)+" vv:"+Integer.valueOf(vv,16)+" wpf:"+wps);
+					                }
+			                	}else{
+			                		str1 = str1 + "03";
+			                		//System.out.println("status:"+"03 "+"va:"+Integer.valueOf(va,16)+" vv:"+Integer.valueOf(vv,16)+" wpf:"+wps);
+			                	}
+			                } else {
+			                	str1 = str1 + "00";
+			                }
+			                
+			                //old
+			                /*if(statewarn.equals("0")){
 				                String state = elm.element("state").getStringValue();   //焊机状态
 				                if(state.equals("待机")){
 				                	str1 = str1 + "00";
@@ -828,7 +878,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				                }else {
 				                	str1 = str1 + "00";
 				                }
-			                }
+			                }*/
 			                
 			                String wd = elm.element("wd").getStringValue();   //焊丝直径
 			                if(wd.equals("0.6")){
@@ -849,10 +899,30 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			                	str1 = str1 + "10";
 			                }
 			                
-			                int va_up = Integer.parseInt(elm.element("va_up").getStringValue()); //电流上限
-			                int vv_up = (int) (Double.valueOf(elm.element("vv_up").getStringValue())*10); //电压上限
-		                    int va_down = Integer.parseInt(elm.element("va_down").getStringValue()); //电流下限
-		                    int vv_down = (int) (Double.valueOf(elm.element("vv_down").getStringValue())*10); //电压下限
+			                int va_up = 0;
+			                int vv_up = 0;
+		                    int va_down = 0;
+		                    int vv_down = 0;
+		                    try{
+				                va_up = Integer.valueOf(wpsde[4]); //电流上限
+		                    }catch(Exception e){
+		                    	va_up = 200;
+		                    }
+		                    try{
+		                    	vv_up = Integer.valueOf(wpsde[6]); //电压上限
+		                    }catch(Exception e){
+		                    	vv_up = 40;
+		                    }
+		                    try{
+		                    	va_down = Integer.valueOf(wpsde[5]); //电流下限
+		                    }catch(Exception e){
+		                    	va_down = 20;
+		                    }
+		                    try{
+		                    	vv_down = Integer.valueOf(wpsde[7]); //电压下限
+		                    }catch(Exception e){
+		                    	vv_down = 10;
+		                    } 
 		                    
 		                    if(va_down>va_up){
 		                    	str1 = str1 + "010000";
@@ -916,28 +986,53 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			                	}
 			                }
 			                
-			                String wa_up = Integer.toHexString(Integer.valueOf(elm.element("wa_up").getStringValue())); //报警电流上限
+			                int wa_up1 = 0;
+			                int wv_up1 = 0;
+		                    int wa_down1 = 0;
+		                    int wv_down1 = 0;
+		                    try{
+		                    	wa_up1 = Integer.valueOf(wpsde[0]); //电流上限
+		                    }catch(Exception e){
+		                    	wa_up1 = 500;
+		                    }
+		                    try{
+		                    	wv_up1 = Integer.valueOf(wpsde[2]); //电压上限
+		                    }catch(Exception e){
+		                    	wv_up1 = 50;
+		                    }
+		                    try{
+		                    	wa_down1 = Integer.valueOf(wpsde[1]); //电流下限
+		                    }catch(Exception e){
+		                    	wa_down1 = 10;
+		                    }
+		                    try{
+		                    	wv_down1 = Integer.valueOf(wpsde[3]); //电压下限
+		                    }catch(Exception e){
+		                    	wv_down1 = 5;
+		                    } 
+			                
+			                String wa_up = Integer.toHexString(wa_up1); //报警电流上限
 			                if(wa_up.length()<4){
 			                	int len = 4 - wa_up.length();
 			                	for(int i=0;i<len;i++){
 			                		wa_up = "0" + wa_up;
 			                	}
 			                }
-			                String wv_up = Integer.toHexString((int)(Double.valueOf(elm.element("wv_up").getStringValue())*10)); //报警电压上限
+			                String wv_up = Integer.toHexString(wv_up1); //报警电压上限
 			                if(wv_up.length()<4){
 			                	int len = 4 - wv_up.length();
 			                	for(int i=0;i<len;i++){
 			                		wv_up = "0" + wv_up;
 			                	}
 			                }
-		                    String wa_down = Integer.toHexString(Integer.parseInt(elm.element("wa_down").getStringValue())); //报警电流下限
+		                    String wa_down = Integer.toHexString(wa_down1); //报警电流下限
 		                    if(wa_down.length()<4){
 			                	int len = 4 - wa_down.length();
 			                	for(int i=0;i<len;i++){
 			                		wa_down = "0" + wa_down;
 			                	}
 			                }
-		                    String wv_down = Integer.toHexString((int)(Double.valueOf(elm.element("wv_down").getStringValue())*10)); //报警电压下限
+		                    String wv_down = Integer.toHexString(wv_down1); //报警电压下限
 		                    if(wv_down.length()<4){
 			                	int len = 4 - wv_down.length();
 			                	for(int i=0;i<len;i++){
@@ -957,18 +1052,20 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				}
 			 
 			Date dt4 = new Date();
-			dataView.append("实时开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt1) + "\r\n");
-			dataView.append("实时调用wcf方法开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2) + "\r\n");
-			dataView.append("实时调用wcf方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3) + "\r\n");
+			dataView.append("实时开始："+DateTools.format("YY-MM-dd hh:mm:ss", dt1) + "\r\n");
+			//dataView.append("实时调用wcf方法开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2) + "\r\n");
+			//dataView.append("实时调用wcf方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3) + "\r\n");
 			dataView.append("数据条数："+ Integer.toString(count1) + "\r\n");
-			dataView.append("实时结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt4) + "\r\n");
+			dataView.append("实时结束："+DateTools.format("YY-MM-dd hh:mm:ss", dt4) + "\r\n");
 			dataView.append("\r\n");
 		}
 		 
 	 };
 	 
-	 public void tranpan() {
+	 public void tranpan(WeldServiceStub stu, HashMap<String, String> hm) {
 		// TODO Auto-generated method stub
+		 this.stu = stu;
+		 this.hm = hm;
 		 new Thread(tranpanrun).start();
 		 //tranpanrun();
 	 }
@@ -1020,6 +1117,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
+				        	 
+				        	 /*String year = Integer.valueOf(str.subSequence(38, 40).toString(),16).toString();
+		      	    		 String month = Integer.valueOf(str.subSequence(40, 42).toString(),16).toString();
+		      	    		 String day = Integer.valueOf(str.subSequence(42, 44).toString(),16).toString();
+		      	    		 String hour = Integer.valueOf(str.subSequence(44, 46).toString(),16).toString();
+		      	    		 String minute = Integer.valueOf(str.subSequence(46, 48).toString(),16).toString();
+		      	    		 String second = Integer.valueOf(str.subSequence(48, 50).toString(),16).toString();
+		      	    		 String strdate = year+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
+				        	 dataView.append(" 焊机：0001   电流:"+Integer.toString(Integer.valueOf(str.subSequence(50, 54).toString(),16))+"   电压："+Integer.toString(Integer.valueOf(str.subSequence(54, 58).toString(),16))+"   时间："+strdate+"\r\n");*/ 
 					         dataView.append(" " + str + "\r\n"); 
 				          }catch(Exception ex){
 							 ex.printStackTrace();
