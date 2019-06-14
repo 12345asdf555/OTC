@@ -54,7 +54,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		 String str = (String) msg;
 		 
-		 if(str.substring(0,2).equals("JN")){    //江南派工：任务号id、焊工id、焊机id、状态、焊机编号
+		 if(str.substring(0,2).equals("JN")){    //江南派工：任务号id、焊工id、焊机id、状态、焊机编号 JN,1,19,19,0,0001
 
 			 synchronized (listarrayJN) {
 			 listarrayJN = client.NS.listarrayJN;

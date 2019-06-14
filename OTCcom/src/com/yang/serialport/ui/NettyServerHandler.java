@@ -104,434 +104,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			 
 		 }
 	}
- 	
-	public void tranpanrun() {
-		// TODO Auto-generated method stub
-		try{
-			 
-			Date dt1 = new Date();
-			dataView.append("实时开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt1) + "\r\n");
-			 
-			 try {
-				  FileInputStream in = new FileInputStream("IPconfig.txt");  
-		          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
-		          BufferedReader bufReader = new BufferedReader(inReader);  
-		          String line = null; 
-		          int writetime=0;
-					
-				    while((line = bufReader.readLine()) != null){ 
-				    	if(writetime==0){
-			                writetime++;
-				    	}
-				    	else if(writetime==1){
-				    		writetime++;
-				    	}else{
-			                ip=line;
-				    	}
-		          }  
-
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			 
-
-				Date dt2 = new Date();
-				dataView.append("实时调用wcf方法开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2) + "\r\n");
-				EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
-				WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
-				
-				//;
-				//stu._getServiceClient().sendto
-				//stu._getServiceClient().setTargetEPR(endpoint);~
-				//stu._getServiceClient().getOptions().setTo(endpoint);;
-			
-				
-				//stu._getServiceClient().getOptions().setProperty(AddressingConstants., org.apache.axis2.addressing.AddressingConstants.Final.WSA_NAMESPACE);
-		        //int setWebServiceTimeOutInSeconds=mySession.getVariable(IProjectVariables.SET_WEB_SERVICE_TIME_OUT_IN_SECONDS).getSimpleVariable().getIntValue();
-		        //stu._getServiceClient().getOptions().setTimeOutInMilliSeconds(setWebServiceTimeOutInSeconds*1000);
-		        stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
-		        stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制.
-				
-				//stu._getServiceClient().
-				
-				ServiceCall sc = new ServiceCall();
-				CompositeType tt=new CompositeType();
-				tt.setWeldDataTable("");
-				tt.setCmdCode(603220101);
-			
-				sc.setCmd(tt);
-				
-				ServiceCallResponse a = stu.serviceCall(sc);
-				CompositeType rs= a.getServiceCallResult();
-				String xml = rs.getWeldDataTable();
-				
-				Date dt3 = new Date();
-				dataView.append("实时调用wcf方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3) + "\r\n");
-				
-				Document doc = DocumentHelper.parseText(xml);
-				
-				Element rootElt = doc.getRootElement(); // 获取根节点
-		
-		        List nodes = rootElt.elements("dt");
-		    	String str1 = "";
-		        for (Iterator it = nodes.iterator(); it.hasNext();) {
-		            Element elm = (Element) it.next();
-		            
-		            Element elmbuf1 = elm.element("state");
-		            
-		            if(!elmbuf1.getStringValue().equals("关闭")){
-		/*                    for(Iterator it1=elm.elementIterator();it1.hasNext();){
-		                    Element element = (Element) it1.next();
-		                    json.put(element.getName(), element.getStringValue());
-		                    System.out.println("点：" + element.getName() + " " + element.getStringValue()); // 拿到根节点的名称    
-		                };*/
-		            	str1 = "7E730101012280";
-		                String nom = Integer.toHexString(Integer.valueOf(elm.element("nom").getStringValue())); //设备编号
-		                if(nom.length()<4){
-		                	int len = 4 - nom.length();
-		                	for(int i=0;i<len;i++){
-		                		nom = "0" + nom;
-		                	}
-		                }
-
-        				int countweld = 0;          //设备编号对应任务信息得到焊机编号
-        				String weldid = "";
-		                if(listweld.size()==0){
-	        				str1 = str1 + "00000000";
-	        			}else{
-	        				for(int a1=0;a1<listweld.size();a1+=4){
-		        				if(Integer.valueOf(listweld.get(a1+1)) == (Integer.parseInt(nom,16))){
-		        					String gatherid = listweld.get(a1);
-		        					weldid = listweld.get(a1+2);
-		        					
-		        					if(gatherid.length() != 4){
-		        						int length = 4 - gatherid.length();
-		        						for(int b=0;b<length;b++){
-		        							gatherid = "0" + gatherid;
-		        						}
-		        					}
-		        					if(weldid.length() != 4){
-		        						int length = 4 - weldid.length();
-		        						for(int b=0;b<length;b++){
-		        							weldid = "0" + weldid;
-		        						}
-		        					}
-		        					
-		        					str1 = str1 + gatherid + weldid;
-		        					countweld = 0;
-		        					
-		        					break;
-		        				}else{
-		        					countweld++;
-		        					if(countweld == listweld.size()/4){
-		        						str1 = str1 + "00000000";
-		        						countweld = 0;
-		        					}
-		        				}
-		        			}
-	        			}
-		                
-		                
-	        			if(listarrayJN.size()==0){             //设备编号对应任务信息得到焊工信息
-	        				str1 = str1 + "0000000000000000";
-	        			}else{
-	        				String welder1 = "0000000000000000";
-	        				int count = 0;
-	        				for(int i=0;i<listarrayJN.size();i+=5){
-	        					if(weldid.equals("")){
-	        						str1 = str1 + "0000000000000000";
-	        						break;
-	        					}else{
-	        						if(Integer.valueOf(weldid).toString().equals(listarrayJN.get(i+2))){
-			                    		welder1 = listarrayJN.get(i+1);
-			                    		if(welder1!=""){
-			                        		if(welder1.length()<16){
-			                                	int length = 16 - welder1.length();
-			                                	for(int j=0;j<length;j++){
-			                                		welder1 = "0" + welder1;
-			                                	}
-			                                	str1 = str1 + welder1;
-			                                	welder1 = "0000000000000000";
-			                                	break;
-			                                }
-			                    		}else{
-			                    			str1 = str1 + "0000000000000000";
-			                    		}
-				                    	break;
-			                    	}else{
-			        					count++;
-			        					if(count == listarrayJN.size()/5){
-			        						str1 = str1 + "0000000000000000";
-			        						count = 0;
-			        					}
-			        				}
-	        					}
-		                    }
-	        			}
-		                
-	        			Calendar ad = Calendar.getInstance();             //时间
-	        			String year = Integer.toHexString(ad.get(Calendar.YEAR)-2000);
-	        			if(year.length()<2){
-		                	int len = 2 - year.length();
-		                	for(int i=0;i<len;i++){
-		                		year = "0" + year;
-		                	}
-		                }
-	        			String month = Integer.toHexString(ad.get(Calendar.MONTH)+1);
-	        			if(month.length()<2){
-		                	int len = 2 - month.length();
-		                	for(int i=0;i<len;i++){
-		                		month = "0" + month;
-		                	}
-		                }
-	        			String day = Integer.toHexString(ad.get(Calendar.DAY_OF_MONTH));
-	        			if(day.length()<2){
-		                	int len = 2 - day.length();
-		                	for(int i=0;i<len;i++){
-		                		day = "0" + day;
-		                	}
-		                }
-	        			String hour = Integer.toHexString(ad.get(Calendar.HOUR_OF_DAY));
-	        			if(hour.length()<2){
-		                	int len = 2 - hour.length();
-		                	for(int i=0;i<len;i++){
-		                		hour = "0" + hour;
-		                	}
-		                }
-	        			String minute = Integer.toHexString(ad.get(Calendar.MINUTE));
-	        			if(minute.length()<2){
-		                	int len = 2 - minute.length();
-		                	for(int i=0;i<len;i++){
-		                		minute = "0" + minute;
-		                	}
-		                }
-	        			String second = Integer.toHexString(ad.get(Calendar.SECOND));
-	        			if(second.length()<2){
-		                	int len = 2 - second.length();
-		                	for(int i=0;i<len;i++){
-		                		second = "0" + second;
-		                	}
-		                }
-		                str1 = str1 + year + month + day + hour + minute + second;
-	        			
-		                
-		                String va = Integer.toHexString(Integer.valueOf(elm.element("wa").getStringValue())); //电流
-		                if(va.length()<4){
-		                	int len = 4 - va.length();
-		                	for(int i=0;i<len;i++){
-		                		va = "0" + va;
-		                	}
-		                }
-		                str1 = str1 + va;
-		                
-		                
-		                String vv = Integer.toHexString((int) (Double.valueOf(elm.element("wv").getStringValue())*10)); //电压
-		                if(vv.length()<4){
-		                	int len = 4 - vv.length();
-		                	for(int i=0;i<len;i++){
-		                		vv = "0" + vv;
-		                	}
-		                }
-		                str1 = str1 + vv;
-		                str1 = str1 + "000000000000";
-		                
-		                if(listarrayJN.size()==0){             //设备编号对应任务信息得到焊口信息
-	        				str1 = str1 + "00000000";
-	        			}else{
-	        				String code = "00000000";
-	        				int counta = 0;
-	        				for(int i=0;i<listarrayJN.size();i+=5){
-	        					if(weldid.equals("")){
-	        						str1 = str1 + "00000000";
-	        						break;
-	        					}else{
-	        						if(Integer.valueOf(weldid).toString().equals(listarrayJN.get(i+2))){
-	        							code = listarrayJN.get(i);
-			                    		if(code!=""){
-			                        		if(code.length()<8){
-			                                	int length = 8 - code.length();
-			                                	for(int j=0;j<length;j++){
-			                                		code = "0" + code;
-			                                	}
-			                                	str1 = str1 +code;
-			                                	code = "00000000";
-			                                	break;
-			                                }
-			                    		}else{
-			                    			str1 = str1 + "00000000";
-			                    		}
-				                    	break;
-			                    	}else{
-			        					counta++;
-			        					if(counta == listarrayJN.size()/5){
-			        						str1 = str1 + "00000000";
-			        						counta = 0;
-			        					}
-			        				}
-	        					}
-		                    }
-	        			}
-		                
-		                String statewarn = elm.element("wawv_alter").getStringValue();   //焊机报警状态判断
-		                if(statewarn.equals("0")){
-			                String state = elm.element("state").getStringValue();   //焊机状态
-			                if(state.equals("待机")){
-			                	str1 = str1 + "00";
-			                }else if(state.equals("焊接")){
-			                	str1 = str1 + "03";
-			                }else {
-			                	str1 = str1 + "00";
-			                }
-		                }else if(statewarn.equals("1")){
-		                	str1 = str1 + "63";
-		                }else{
-		                	String state = elm.element("state").getStringValue();   //焊机状态
-			                if(state.equals("待机")){
-			                	str1 = str1 + "00";
-			                }else if(state.equals("焊接")){
-			                	str1 = str1 + "03";
-			                }else if(state.equals("报警")){
-			                	str1 = str1 + "98";
-			                }else {
-			                	str1 = str1 + "00";
-			                }
-		                }
-		                
-		                String wd = elm.element("wd").getStringValue();   //焊丝直径
-		                if(wd.equals("0.6")){
-		                	str1 = str1 + "06";
-		                }else if(wd.equals("0.8")){
-		                	str1 = str1 + "08";
-		                }else if(wd.equals("0.9")){
-		                	str1 = str1 + "09";
-		                }else if(wd.equals("1.0")){
-		                	str1 = str1 + "0A";
-		                }else if(wd.equals("1.2")){
-		                	str1 = str1 + "0C";
-		                }else if(wd.equals("1.4")){
-		                	str1 = str1 + "0E";
-		                }else if(wd.equals("1.6")){
-		                	str1 = str1 + "10";
-		                }else {
-		                	str1 = str1 + "10";
-		                }
-		                
-		                int va_up = Integer.parseInt(elm.element("va_up").getStringValue()); //电流上限
-		                int vv_up = (int) (Double.valueOf(elm.element("vv_up").getStringValue())*10); //电压上限
-	                    int va_down = Integer.parseInt(elm.element("va_down").getStringValue()); //电流下限
-	                    int vv_down = (int) (Double.valueOf(elm.element("vv_down").getStringValue())*10); //电压下限
-	                    
-	                    if(va_down>va_up){
-	                    	str1 = str1 + "010000";
-	                    }else{
-	                    	String vaset = Integer.toHexString((va_up+va_down)/2);
-			                if(vaset.length()<4){
-			                	int len = 4 - vaset.length();
-			                	for(int i=0;i<len;i++){
-			                		vaset = "0" + vaset;
-			                	}
-			                }
-	                    	str1 = str1 + "01" + vaset;
-	                    }
-		                
-	                    if(vv_down>vv_up){
-	                    	str1 = str1 + "0000";
-	                    }else{
-	                    	String vvset = Integer.toHexString((vv_up+vv_down)/2);
-			                if(vvset.length()<4){
-			                	int len = 4 - vvset.length();
-			                	for(int i=0;i<len;i++){
-			                		vvset = "0" + vvset;
-			                	}
-			                }
-	                    	str1 = str1 + vvset;
-	                    }
-	                    
-	                    if(va_down>va_up){
-	                    	str1 = str1 + "00";
-	                    }else{
-	                    	String vaset = Integer.toHexString((va_up-va_down)/2);
-			                if(vaset.length()<2){
-			                	int len = 2 - vaset.length();
-			                	for(int i=0;i<len;i++){
-			                		vaset = "0" + vaset;
-			                	}
-			                }
-	                    	str1 = str1 + vaset;
-	                    }
-		                
-	                    if(vv_down>vv_up){
-	                    	str1 = str1 + "00";
-	                    }else{
-	                    	String vvset = Integer.toHexString((vv_up-vv_down)/2);
-			                if(vvset.length()<2){
-			                	int len = 2 - vvset.length();
-			                	for(int i=0;i<len;i++){
-			                		vvset = "0" + vvset;
-			                	}
-			                }
-	                    	str1 = str1 + vvset;
-	                    }
-	                    
-                    	str1 = str1 + "0000";
-		                
-		                String channel = Integer.toHexString(Integer.valueOf(elm.element("channel").getStringValue())); //通道
-		                if(channel.length()<2){
-		                	int len = 2 - channel.length();
-		                	for(int i=0;i<len;i++){
-		                		channel = "0" + channel;
-		                	}
-		                }
-		                
-		                String wa_up = Integer.toHexString(Integer.valueOf(elm.element("wa_up").getStringValue())); //报警电流上限
-		                if(wa_up.length()<4){
-		                	int len = 4 - wa_up.length();
-		                	for(int i=0;i<len;i++){
-		                		wa_up = "0" + wa_up;
-		                	}
-		                }
-		                String wv_up = Integer.toHexString((int)(Double.valueOf(elm.element("wv_up").getStringValue())*10)); //报警电压上限
-		                if(wv_up.length()<4){
-		                	int len = 4 - wv_up.length();
-		                	for(int i=0;i<len;i++){
-		                		wv_up = "0" + wv_up;
-		                	}
-		                }
-	                    String wa_down = Integer.toHexString(Integer.parseInt(elm.element("wa_down").getStringValue())); //报警电流下限
-	                    if(wa_down.length()<4){
-		                	int len = 4 - wa_down.length();
-		                	for(int i=0;i<len;i++){
-		                		wa_down = "0" + wa_down;
-		                	}
-		                }
-	                    String wv_down = Integer.toHexString((int)(Double.valueOf(elm.element("wv_down").getStringValue())*10)); //报警电压下限
-	                    if(wv_down.length()<4){
-		                	int len = 4 - wv_down.length();
-		                	for(int i=0;i<len;i++){
-		                		wv_down = "0" + wv_down;
-		                	}
-		                }
-		                
-		                str1 = str1 + channel + wa_up + wv_up + wa_down + wv_down + "00177D";
-		                //dataView.append("松下:" + str1 + "\r\n");
-		                chcli.writeAndFlush(str1).sync();
-		            }
-		        }
-		 	} catch (Exception e) {
-				// TODO 自动生成的 catch 块
-		 		dataView.setText("wcf服务器未开启" + "\r\n");
-				e.printStackTrace();
-			}
-		 
-		Date dt4 = new Date();
-		dataView.append("实时结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt4) + "\r\n");
-		dataView.append("\r\n");
-	}
-			 
 	 
 	 public Runnable tranpanrun = new Runnable(){
 
@@ -714,7 +286,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	        					System.out.println("Yes:" + time);
 	        					first1 = false;
 	        				}
-	        				String[] timebuf1 = time.split("/");
+	        				String[] timebuf1 = time.split("-");
 	        				String[] timebuf2 = timebuf1[2].split(" ");
 	        				String[] timebuf3 = timebuf2[1].split(":");
 	        				String year = Integer.toHexString(Integer.valueOf(timebuf1[0].substring(2, 4)));
@@ -779,7 +351,26 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			                	}
 			                }
 			                str1 = str1 + vv;
-			                str1 = str1 + "000000000000";
+			                str1 = str1 + "0000";
+			                
+			                String va1 = Integer.toHexString(Integer.valueOf(elm.element("va").getStringValue())); //电流
+			                if(va1.length()<4){
+			                	int len = 4 - va1.length();
+			                	for(int i=0;i<len;i++){
+			                		va1 = "0" + va1;
+			                	}
+			                }
+			                str1 = str1 + va1;
+			                
+			                
+			                String vv1 = Integer.toHexString((int) (Double.valueOf(elm.element("vv").getStringValue())*10)); //电压
+			                if(vv1.length()<4){
+			                	int len = 4 - vv1.length();
+			                	for(int i=0;i<len;i++){
+			                		vv1 = "0" + vv1;
+			                	}
+			                }
+			                str1 = str1 + vv1;
 			                
 			                if(listarrayJN.size()==0){             //设备编号对应任务信息得到焊口信息
 		        				str1 = str1 + "00000000";
@@ -1109,7 +700,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				  if(str.length()>=6){
 					  
 					  if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22")) && str.length()==282){
-						  
+
+						  System.out.println(str);
 						  str = trans(str); //融合有无任务模式
 						  //str = transOTC(str);
 						  //str = transJN(str);
@@ -1128,7 +720,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				        	 dataView.append(" 焊机：0001   电流:"+Integer.toString(Integer.valueOf(str.subSequence(50, 54).toString(),16))+"   电压："+Integer.toString(Integer.valueOf(str.subSequence(54, 58).toString(),16))+"   时间："+strdate+"\r\n");*/ 
 					         dataView.append(" " + str + "\r\n"); 
 				          }catch(Exception ex){
-							 ex.printStackTrace();
+							 //ex.printStackTrace();
 				 			 dataView.setText("服务器未开启" + "\r\n");
 				          }
 				          

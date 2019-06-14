@@ -575,30 +575,33 @@ public class MainFrame extends JFrame {
 				e.printStackTrace();
 			}
 			
-			try {
-				stu = new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
-		        stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
-		        stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制
-			} catch (AxisFault e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			hm = weldwps(stu);
-			
-			Timer t = new Timer();
-			t.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-			    	wpscount++;
-			    	if(wpscount==30){
-			    		hm = weldwps(stu);
-			    		wpscount=1;
-			    	}
-			    	NS.tranpan(stu,hm);
+			if(ip != "" && ip != null){
+				try {
+					stu = new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
+			        stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
+			        stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制
+				} catch (AxisFault e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			},1000,1000);
+				
+				hm = weldwps(stu);
+				
+				Timer t = new Timer();
+				t.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+				    	wpscount++;
+				    	if(wpscount==60){
+				    		hm = weldwps(stu);
+				    		wpscount=1;
+				    	}
+				    	NS.tranpan(stu,hm);
+					}
+				},1000,1000);
+				
+			}
 			
 		}
 
