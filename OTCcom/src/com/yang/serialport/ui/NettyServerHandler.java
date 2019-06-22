@@ -348,6 +348,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			        					sb.replace(20, 24, weldid);
 			        					countweld = 0;
 			        					
+			        					break;
 			        				}else{
 			        					countweld++;
 			        					if(countweld == listweld.size()/4){
@@ -377,6 +378,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			        					sb.replace(40, 44, welderid);
 			        					countwelder = 0;
 			        					
+			        					break;
 			        				}else{
 			        					countwelder++;
 			        					if(countwelder == listwelder.size()/2){
