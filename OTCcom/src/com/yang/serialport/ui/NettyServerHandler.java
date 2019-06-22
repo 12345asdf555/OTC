@@ -286,7 +286,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	        					System.out.println("Yes:" + time);
 	        					first1 = false;
 	        				}
-	        				String[] timebuf1 = time.split("-");
+	        				String[] timebuf1 = time.split("/");
 	        				String[] timebuf2 = timebuf1[2].split(" ");
 	        				String[] timebuf3 = timebuf2[1].split(":");
 	        				String year = Integer.toHexString(Integer.valueOf(timebuf1[0].substring(2, 4)));
