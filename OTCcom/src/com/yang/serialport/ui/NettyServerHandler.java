@@ -786,7 +786,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	          	    	check5 = ((Integer.toHexString(check4)).toUpperCase()).substring(2,4);
 	          	    }
 	          	    String check6 = str.substring(278,280);
-	          	    if(check5.equals(check6)){
+	          	    if(check6.equals(check6)){
 	          	    	
 	          	    	StringBuilder sb = new StringBuilder(str);
 	        			
