@@ -286,7 +286,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	        					System.out.println("Yes:" + time);
 	        					first1 = false;
 	        				}
-	        				String[] timebuf1 = time.split("/");
+	        				String[] timebuf1 = time.split("-");
 	        				String[] timebuf2 = timebuf1[2].split(" ");
 	        				String[] timebuf3 = timebuf2[1].split(":");
 	        				String year = Integer.toHexString(Integer.valueOf(timebuf1[0].substring(2, 4)));
@@ -701,7 +701,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					  
 					  if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22")) && str.length()==282){
 
-						  System.out.println(str);
+						  //System.out.println(str);
 						  str = trans(str); //融合有无任务模式
 						  //str = transOTC(str);
 						  //str = transJN(str);
@@ -884,7 +884,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				                    		}else{
 				                    			code = "00000000";
 				                    		}
-
+			        						break;
 				                    	}
 		        					}
 			                    }
