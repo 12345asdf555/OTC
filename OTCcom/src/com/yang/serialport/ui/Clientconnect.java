@@ -17,6 +17,8 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import io.netty.util.CharsetUtil;
 
 //作为客户端连接服务器
@@ -85,7 +87,10 @@ public class Clientconnect
     	  socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(4));    
     	  socketChannel.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));    
     	  socketChannel.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8)); 
-          socketChannel.pipeline().addLast(handler);  
+          socketChannel.pipeline().addLast(
+					new ReadTimeoutHandler(100),
+					new WriteTimeoutHandler(100),
+					handler);  
           CL.socketChannel = socketChannel;
         }  
       });  
