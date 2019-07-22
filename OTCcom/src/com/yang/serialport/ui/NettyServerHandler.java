@@ -88,88 +88,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 	private boolean first1 = true;
 
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		String buf  = ByteBufUtil.hexDump((ByteBuf)msg);
-		String data = convertHexToString(buf);
-
-		if(data.substring(0,2).equals("00")){
-
-			//ctx.writeAndFlush(msg).sync();
-			//获取job列表
-			String datasend = "00";
-			String[] databuf = data.split("//");
-			for(int i=3;i<databuf.length;i+=3){
-				if(i == 3){
-					datasend = datasend + ":" +  databuf[i].substring(databuf[i].length()-1,databuf[i].length()) + "," + databuf[i+1] + ";";
-				}else if(i == databuf.length-1){
-					break;
-				}else{
-					datasend = datasend + databuf[i].substring(2,databuf[i].length()) + "," + databuf[i+1] + ";";
-				}
-			}
-			chcli.writeAndFlush(datasend).sync();
-
-		}else if(data.substring(0,2).equals("10")){
-			/*byte[] a = ("04"+data.substring(2,data.length())).getBytes();
-			ctx.writeAndFlush(Unpooled.copiedBuffer(a)).sync();*/
-			//ctx.writeAndFlush(msg).sync();
-			//获取job详细数据
-			String datasend1 = "01";
-			String[] databuf1 = data.split("//");
-			datasend1 =  datasend1 + ":" + databuf1[4] + ":" + databuf1[5] + databuf1[6].substring(0,databuf1[6].length()-1);
-
-			chcli.writeAndFlush(datasend1).sync();
-
-		}else if(data.substring(0,2).equals("01")){
-			/*byte[] a = ("04"+data.substring(2,data.length())).getBytes();
-			ctx.writeAndFlush(Unpooled.copiedBuffer(a)).sync();*/
-			//ctx.writeAndFlush(msg).sync();
-			//获取job详细数据
-			String datasend1 = "01";
-			String[] databuf1 = data.split("//");
-			String[] databuf2 = databuf1[3].split("\\{");
-			datasend1 =  datasend1 + ":" + databuf1[4] + ":" + databuf1[5] + databuf1[6].substring(0,databuf1[6].length()-1) + ":" + databuf2[1];
-
-			chcli.writeAndFlush(datasend1).sync();
-
-		}else if(data.substring(0,2).equals("02")){
-
-			//ctx.writeAndFlush(msg).sync();
-			//获取福尼斯实时
-			String datasend2 = "02";
-			String[] databuf2 = data.split("//");
-			String[] tranbuf = databuf2[13].split("\\{");
-			datasend2 = datasend2 + ":" + tranbuf[1] + "," +  databuf2[19] + "," +  databuf2[26];
-			datasend2 = datasend2.substring(0, datasend2.length()-2);
-			chcli.writeAndFlush(datasend2).sync();
-
-		}else if(data.substring(0,2).equals("03")){
-
-			//ctx.writeAndFlush(msg).sync();
-			//获取福尼斯曲线
-			String datasend3 = "03";
-			String[] databuf3 = data.split("//");
-			for(int i=5;i<databuf3.length;i+=5){
-				if(i == 5){
-					String[] tranbuf1 = databuf3[i+5].split("\\{");
-					datasend3 = datasend3 + ":" +  databuf3[i].substring(9,databuf3[i].length()) + "," + databuf3[i+1] + "," + databuf3[i+2] + "," + databuf3[i+3] + "," + databuf3[i+4] + "," + tranbuf1[1] + ";";
-				}else if(i == databuf3.length-6){
-					String[] tranbuf1 = databuf3[i+5].split("\\}");
-					datasend3 = datasend3 + databuf3[i].substring(3,databuf3[i].length()) + "," + databuf3[i+1] + "," + databuf3[i+2] + "," + databuf3[i+3] + "," + databuf3[i+4] + "," + tranbuf1[0] + ";";
-					break;
-				}else{
-					String[] tranbuf1 = databuf3[i+5].split("\\{");
-					datasend3 = datasend3 + databuf3[i].substring(3,databuf3[i].length()) + "," + databuf3[i+1] + "," + databuf3[i+2] + "," + databuf3[i+3] + "," + databuf3[i+4] + "," + tranbuf1[1] + ";";
-				}
-			}
-			chcli.writeAndFlush(datasend3).sync();
-
-		}else if(data.substring(0,2).equals("04")){
-
-			chcli.writeAndFlush(data).sync();
-
-		}
-
-		/*ByteBuf buf = null;
+		ByteBuf buf = null;
 		 byte[] req = null;
 		 try{
 			 buf=(ByteBuf)msg; 
@@ -190,27 +109,9 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 //			 ReferenceCountUtil.release(msg);
 //			 ReferenceCountUtil.release(req);
 
-		 }*/
+		 }
 	}
 
-	//福尼斯string转asc
-	public String convertHexToString(String hex) { 		
-		StringBuilder sb = new StringBuilder();		
-		StringBuilder temp = new StringBuilder(); 		
-		// 564e3a322d302e312e34 split into two characters 56, 4e, 3a...		
-		for (int i = 0; i < hex.length() - 1; i += 2) { 			
-			// grab the hex in pairs			
-			String output = hex.substring(i, (i + 2));			
-			// convert hex to decimal			
-			int decimal = Integer.parseInt(output, 16);			
-			// convert the decimal to character			
-			sb.append((char) decimal); 			
-			temp.append(decimal);		
-		}		
-		// System.out.println(sb.toString());		
-		return sb.toString();	
-	}
-	
 	public Runnable tranpanrun = new Runnable(){
 
 		@Override
@@ -392,7 +293,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 							System.out.println("Yes:" + time);
 							first1 = false;
 						}
-						String[] timebuf1 = time.split("-");
+						String[] timebuf1 = time.split("/");
 						String[] timebuf2 = timebuf1[2].split(" ");
 						String[] timebuf3 = timebuf2[1].split(":");
 						String year = Integer.toHexString(Integer.valueOf(timebuf1[0].substring(2, 4)));
@@ -896,6 +797,12 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 
 						StringBuilder sb = new StringBuilder(str);
 
+						sb.replace(34, 38, "0001");
+						sb.replace(70, 78, "00000001");
+						sb.replace(150, 158, "00000001");
+						sb.replace(230, 238, "00000001");
+						str = sb.toString();
+						
 						String weld = str.substring(14, 18);
 						String welder = str.substring(34, 38);
 						String junction1 = str.substring(70, 78);
@@ -1079,8 +986,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 							//焊口编号对应id(有三组数据的焊口)
 							if(listjunction.size()==0){
 								sb.replace(70, 78, "00000000");
-								sb.replace(134, 142, "00000000");
-								sb.replace(198, 206, "00000000");
+								sb.replace(150, 158, "00000000");
+								sb.replace(230, 238, "00000000");
 							}else{
 								for(int a=0;a<listjunction.size();a+=2){
 									if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction1,16))){
@@ -1116,13 +1023,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 											}
 										}
 
-										sb.replace(134, 142, junctionid);
+										sb.replace(150, 158, junctionid);
 										countjunction = 0;
 
 									}else{
 										countjunction++;
 										if(countjunction == listjunction.size()/2){
-											sb.replace(134, 142, "00000000");
+											sb.replace(150, 158, "00000000");
 											countjunction = 0;
 										}
 									}
@@ -1139,13 +1046,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 											}
 										}
 
-										sb.replace(198, 206, junctionid);
+										sb.replace(230, 238, junctionid);
 										countjunction = 0;
 
 									}else{
 										countjunction++;
 										if(countjunction == listjunction.size()/2){
-											sb.replace(198, 206, "00000000");
+											sb.replace(230, 238, "00000000");
 											countjunction = 0;
 										}
 									}

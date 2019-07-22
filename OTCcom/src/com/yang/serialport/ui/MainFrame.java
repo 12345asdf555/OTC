@@ -95,7 +95,6 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import javax.xml.namespace.QName;
 
-import com.yang.serialport.ui.IsnullUtil;
 import com.alibaba.fastjson.JSONArray;
 /*import com.yang.serialport.exception.NoSuchPort;
 import com.yang.serialport.exception.NotASerialPort;
@@ -138,6 +137,7 @@ public class MainFrame extends JFrame {
 	public String msg;
 	public String fitemid;
 	public NettyServerHandler NS = new NettyServerHandler();
+	public NettyServerHandlerF NSF = new NettyServerHandlerF();
 	public Clientconnect clientconnect = new Clientconnect(NS,this);
 	public TcpClientHandler TC = new TcpClientHandler();
 	public HashMap<String, SocketChannel> socketlist = new HashMap();
@@ -453,9 +453,9 @@ public class MainFrame extends JFrame {
 
 			if(iffirst){
 				new Thread(work).start();
+				//new Thread(workf).start();
 				new Thread(cli).start();
 				new Thread(pan).start();
-				new Thread(fou).start();
 				iffirst = false;
 			}
 
@@ -543,72 +543,6 @@ public class MainFrame extends JFrame {
 		sendData.setFocusable(false);
 		sendData.setBounds(70, 40, 90, 30);
 	}
-
-	//福尼斯实时数据获取
-	public Runnable fou = new Runnable(){
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			String ip = "";
-
-			try {
-				FileInputStream in = new FileInputStream("IPconfig.txt");  
-				InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
-				BufferedReader bufReader = new BufferedReader(inReader);  
-				String line = null; 
-				int writetime=0;
-
-				while((line = bufReader.readLine()) != null){ 
-					if(writetime==0){
-						writetime++;
-					}
-					else if(writetime==1){
-						writetime++;
-					}else if(writetime==2){
-						ip=line;
-						writetime++;
-					}else{
-						ip=line;
-					}
-				}  
-
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			String[] ipbuf = ip.split(":");
-			if(ipbuf.length != 1){
-				try {
-					stu = new WeldServiceStub("http://"+ipbuf[1]+":8734/JN_WELD_Service/Service1/");
-					stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
-					stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制
-					
-					ServiceCall sc = new ServiceCall();
-					
-					CompositeType tt=new CompositeType();
-					tt.setWeldDataTable("");
-					tt.setCmdCode(19070901);
-				
-					sc.setCmd(tt);
-					
-					ServiceCallResponse a = stu.serviceCall(sc);
-					CompositeType rs= a.getServiceCallResult();
-					String xml = rs.getWeldDataTable();
-				} catch (AxisFault e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-
-	};
 
 	//松下实时数据获取
 	public Runnable pan =new Runnable(){
@@ -781,7 +715,7 @@ public class MainFrame extends JFrame {
 	}
 
 	//福尼斯测试
-	public Runnable work = new Runnable() {
+	public Runnable workf = new Runnable() {
 
 		int count = 0;
 
@@ -813,7 +747,7 @@ public class MainFrame extends JFrame {
 							chsoc.pipeline().addLast(
 									new ReadTimeoutHandler(100),
 									new WriteTimeoutHandler(100),
-									NS);
+									NSF);
 							socketlist.clear();
 							socketcount++;
 							socketlist.put(Integer.toString(socketcount),chsoc);
@@ -825,7 +759,7 @@ public class MainFrame extends JFrame {
 
 				//绑定端口，等待同步成功  
 				ChannelFuture f;
-				f = b.bind(5555).sync();
+				f = b.bind(5554).sync();
 				//等待服务端关闭监听端口  
 				f.channel().closeFuture().sync(); 
 			} catch (InterruptedException e) {
@@ -840,7 +774,7 @@ public class MainFrame extends JFrame {
 	};
 	
 	//开启服务器供焊机连接
-	/*public Runnable work = new Runnable() {
+	public Runnable work = new Runnable() {
 
 		int count = 0;
 
@@ -869,7 +803,10 @@ public class MainFrame extends JFrame {
 							//chsoc.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
 
 							//焊机连接上后,存入list数组中
-							chsoc.pipeline().addLast(NS);
+							chsoc.pipeline().addLast(
+									new ReadTimeoutHandler(100),
+									new WriteTimeoutHandler(100),
+									NS);
 							socketcount++;
 							socketlist.put(Integer.toString(socketcount),chsoc);
 							TC.socketlist = socketlist;
@@ -892,7 +829,7 @@ public class MainFrame extends JFrame {
 				workerGroup.shutdownGracefully();  
 			} 
 		}
-	};*/
+	};
 
 	public static void main(String args[]) {
 		new MainFrame().setVisible(true);

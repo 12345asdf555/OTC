@@ -259,6 +259,11 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			//松下索取参数
 			wcfget(str,ctx); 
 
+		}else if(str.length() == 52 && str.substring(0,6).equals("FE5AA5") && str.substring(40,44).equals("0212")){
+
+			//松下锁定通道
+			wcflock(str,ctx); 
+
 		}else{    //处理下发和上传
 			synchronized (client.mainFrame.socketlist) {
 
@@ -334,6 +339,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 						writetime++;
 					}else if(writetime==2){
 						ip=line;
+						writetime++;
 					}
 				}  
 
@@ -352,21 +358,9 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 
 				EndpointReference endpoint=new EndpointReference("http://"+ipbuf[1]+":8734/JN_WELD_Service/Service1/");
 				WeldServiceStub stu=new WeldServiceStub("http://"+ipbuf[1]+":8734/JN_WELD_Service/Service1/");
-
-				//;
-				//stu._getServiceClient().sendto
-				//stu._getServiceClient().setTargetEPR(endpoint);~
-				//stu._getServiceClient().getOptions().setTo(endpoint);;
-
-
-				//stu._getServiceClient().getOptions().setProperty(AddressingConstants., org.apache.axis2.addressing.AddressingConstants.Final.WSA_NAMESPACE);
-				//int setWebServiceTimeOutInSeconds=mySession.getVariable(IProjectVariables.SET_WEB_SERVICE_TIME_OUT_IN_SECONDS).getSimpleVariable().getIntValue();
-				//stu._getServiceClient().getOptions().setTimeOutInMilliSeconds(setWebServiceTimeOutInSeconds*1000);
 				stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
 				stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制.
-
-				//stu._getServiceClient().
-
+				
 				ServiceCall sc = new ServiceCall();
 
 				CompositeType tt=new CompositeType();
@@ -394,12 +388,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 					Element elmbuf2 = elm.element("channel");
 
 					if((Integer.valueOf(elmbuf1.getStringValue()).equals(Integer.valueOf(str.substring(10,14),16))) && (Integer.valueOf(elmbuf2.getStringValue()).equals(Integer.valueOf(str.substring(46,48),16)))){
-						/*                    for(Iterator it1=elm.elementIterator();it1.hasNext();){
-	                        Element element = (Element) it1.next();
-	                        json.put(element.getName(), element.getStringValue());
-	                        System.out.println("点：" + element.getName() + " " + element.getStringValue()); // 拿到根节点的名称    
-	                    };*/
-
 						str1 = "FE5AA5005A"+str.substring(10,14)+"00000000000000000000000000021101"+str.substring(46,48)+"0100";
 						String va_up = Integer.toHexString(Integer.valueOf(elm.element("va_up").getStringValue())); //预置电流上限
 						if(va_up.length()<4){
@@ -585,34 +573,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 							}
 						}
 						str1 += dwai_outtime;
-						/*                    String dwai_up = Integer.toHexString(Integer.valueOf(elm.element("dwai_up").getStringValue())); //初期上限
-	                    if(dwai_up.length()<4){
-	                    	int len = 4 - dwai_up.length();
-	                    	for(int i=0;i<len;i++){
-	                    		dwai_up = "0" + dwai_up;
-	                    	}
-	                    }
-	                    String dwai_down = Integer.toHexString(Integer.valueOf(elm.element("dwai_down").getStringValue())); //初期下限
-	                    if(dwai_down.length()<4){
-	                    	int len = 4 - dwai_down.length();
-	                    	for(int i=0;i<len;i++){
-	                    		dwai_down = "0" + dwai_down;
-	                    	}
-	                    }
-	                    String dwaf_up = Integer.toHexString(Integer.valueOf(elm.element("dwaf_up").getStringValue())); //收弧上限
-	                    if(dwaf_up.length()<4){
-	                    	int len = 4 - dwaf_up.length();
-	                    	for(int i=0;i<len;i++){
-	                    		dwaf_up = "0" + dwaf_up;
-	                    	}
-	                    }
-	                    String dwaf_down = Integer.toHexString(Integer.valueOf(elm.element("dwaf_down").getStringValue())); //收弧下限
-	                    if(dwaf_down.length()<4){
-	                    	int len = 4 - dwaf_down.length();
-	                    	for(int i=0;i<len;i++){
-	                    		dwaf_down = "0" + dwaf_down;
-	                    	}
-	                    }*/
 						String wa_up = Integer.toHexString(Integer.valueOf(elm.element("wa_up").getStringValue())); //预置电流报警上限
 						if(wa_up.length()<4){
 							int len = 4 - wa_up.length();
@@ -677,69 +637,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 							}
 						}
 						str1 += AlarmType+"000000000000";
-						/*       String wai_up = Integer.toHexString(Integer.valueOf(elm.element("wai_up").getStringValue())); //初期电流报警上限
-	                    if(wai_up.length()<4){
-	                    	int len = 4 - wai_up.length();
-	                    	for(int i=0;i<len;i++){
-	                    		wai_up = "0" + wai_up;
-	                    	}
-	                    }
-	                    String wvi_up = Integer.toHexString(Integer.valueOf(elm.element("wvi_up").getStringValue())*10); //初期电压报警上限
-	                    if(wvi_up.length()<4){
-	                    	int len = 4 - wvi_up.length();
-	                    	for(int i=0;i<len;i++){
-	                    		wvi_up = "0" + wvi_up;
-	                    	}
-	                    }
-	                    String wai_down = Integer.toHexString(Integer.valueOf(elm.element("wai_down").getStringValue())); //初期电流报警下限
-	                    if(wai_down.length()<4){
-	                    	int len = 4 - wai_down.length();
-	                    	for(int i=0;i<len;i++){
-	                    		wai_down = "0" + wai_down;
-	                    	}
-	                    }
-	                    String wvi_down = Integer.toHexString(Integer.valueOf(elm.element("wvi_down").getStringValue())*10); //初期电压报警下限
-	                    if(wvi_down.length()<4){
-	                    	int len = 4 - wvi_down.length();
-	                    	for(int i=0;i<len;i++){
-	                    		wvi_down = "0" + wvi_down;
-	                    	}
-	                    }
-	                    String waf_up = Integer.toHexString(Integer.valueOf(elm.element("waf_up").getStringValue())); //收弧电流报警上限
-	                    if(waf_up.length()<4){
-	                    	int len = 4 - waf_up.length();
-	                    	for(int i=0;i<len;i++){
-	                    		waf_up = "0" + waf_up;
-	                    	}
-	                    }
-	                    String wvf_up = Integer.toHexString(Integer.valueOf(elm.element("wvf_up").getStringValue())*10); //收弧电压报警上限
-	                    if(wvf_up.length()<4){
-	                    	int len = 4 - wvf_up.length();
-	                    	for(int i=0;i<len;i++){
-	                    		wvf_up = "0" + wvf_up;
-	                    	}
-	                    }
-	                    String waf_down = Integer.toHexString(Integer.valueOf(elm.element("waf_down").getStringValue())); //收弧电流报警下限
-	                    if(waf_down.length()<4){
-	                    	int len = 4 - waf_down.length();
-	                    	for(int i=0;i<len;i++){
-	                    		waf_down = "0" + waf_down;
-	                    	}
-	                    }
-	                    String wvf_down = Integer.toHexString(Integer.valueOf(elm.element("wvf_down").getStringValue())*10); //收弧电压报警下限
-	                    if(wvf_down.length()<4){
-	                    	int len = 4 - wvf_down.length();
-	                    	for(int i=0;i<len;i++){
-	                    		wvf_down = "0" + wvf_down;
-	                    	}
-	                    }
-	                    String wa_TJtime = Integer.toHexString(Integer.valueOf(elm.element("wa_TJtime").getStringValue())); //报警停机时间
-	                    if(wa_TJtime.length()<2){
-	                    	int len = 2 - wa_TJtime.length();
-	                    	for(int i=0;i<len;i++){
-	                    		wa_TJtime = "0" + wa_TJtime;
-	                    	}
-	                    }*/
 						break;
 					}
 				}
@@ -747,10 +644,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 
 				Date dt4 = new Date();
 				System.out.println("索取结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt4));
-				//System.out.println(docXmlText); 
-
-				//String a = sc.getOMElement("509201", null);
-				//System.out.println(a);
 			}
 			
 		} catch (Exception e) {
@@ -783,6 +676,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 						writetime++;
 					}else if(writetime==2){
 						ip=line;
+						writetime++;
 					}
 				}  
 
@@ -801,20 +695,8 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 
 				EndpointReference endpoint=new EndpointReference("http://"+ipbuf[1]+":8734/JN_WELD_Service/Service1/");
 				WeldServiceStub stu=new WeldServiceStub("http://"+ipbuf[1]+":8734/JN_WELD_Service/Service1/");
-
-				//;
-				//stu._getServiceClient().sendto
-				//stu._getServiceClient().setTargetEPR(endpoint);~
-				//stu._getServiceClient().getOptions().setTo(endpoint);;
-
-
-				//stu._getServiceClient().getOptions().setProperty(AddressingConstants., org.apache.axis2.addressing.AddressingConstants.Final.WSA_NAMESPACE);
-				//int setWebServiceTimeOutInSeconds=mySession.getVariable(IProjectVariables.SET_WEB_SERVICE_TIME_OUT_IN_SECONDS).getSimpleVariable().getIntValue();
-				//stu._getServiceClient().getOptions().setTimeOutInMilliSeconds(setWebServiceTimeOutInSeconds*1000);
 				stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
 				stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制.
-
-				//stu._getServiceClient().
 
 				ServiceCall sc = new ServiceCall();
 
@@ -826,7 +708,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 				ServiceCallResponse a = stu.serviceCall(sc);
 				CompositeType rs= a.getServiceCallResult();
 				String xml = rs.getWeldDataTable();
-				//System.out.println(xml);
 
 				Date dt3 = new Date();
 				System.out.println("下发wcf获取方式结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3));
@@ -834,7 +715,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 				Document doc = DocumentHelper.parseText(xml);
 
 				Element rootElt = doc.getRootElement(); // 获取根节点
-				//System.out.println("根节点：" + rootElt.getName() + "\r");
 
 				String[] headbuf = xml.split("<dt>");
 				String head = headbuf[0];
@@ -849,17 +729,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 					Element elmbuf1 = elm.element("nom");
 					Element elmbuf2 = elm.element("channel");
 
-					//System.out.println(Integer.valueOf(elmbuf1.getStringValue()));
-					//System.out.println(Integer.valueOf(elmbuf2.getStringValue()));
-					//System.out.println(Integer.valueOf(str.substring(10,14),16));
-					//System.out.println(Integer.valueOf(str.substring(46,48),16));
-
 					if((Integer.valueOf(elmbuf1.getStringValue()).equals(Integer.valueOf(str.substring(10,14),16))) && (Integer.valueOf(elmbuf2.getStringValue()).equals(Integer.valueOf(str.substring(46,48),16)))){
-						//System.out.println(elmbuf1.getStringValue()); 
-						//System.out.println("节点：" + elm.getName() + "\r");
-
-						/*Element channel = elm.element("channel");E
-	                    channel.setText(Integer.valueOf(str.substring(46,48),16).toString());*/
 
 						Element vaup = elm.element("va_up");
 						vaup.setText(Integer.valueOf(str.substring(52,56),16).toString());
@@ -968,10 +838,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 
 
 						break;
-						/*for(Iterator it1=elm.elementIterator();it1.hasNext();){
-	                        Element element = (Element) it1.next();
-	                        System.out.println("点：" + element.getName() + " " + element.getStringValue()); // 拿到根节点的名称    
-	                    }*/
 					}else{
 						continue;
 					}
@@ -991,7 +857,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 				a = stu.serviceCall(sc);
 				rs= a.getServiceCallResult();
 				xml = rs.getWeldDataTable();
-				//System.out.println(xml);
 
 				Date dt5 = new Date();
 				System.out.println("下发wcf下发方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt5));
@@ -1000,9 +865,6 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 
 				Date dt6 = new Date();
 				System.out.println("下发结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt6));
-
-				//String a = sc.getOMElement("509201", null);
-				//System.out.println(a);
 			}
 			
 		} catch (Exception e) {
@@ -1011,6 +873,120 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 		}
 	}
 
+	private void wcflock(String str, ChannelHandlerContext ctx){
+		// TODO Auto-generated method stub
+		//调用wcf连接服务器
+		Date dt1 = new Date();
+		System.out.println("解锁定开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt1));
+
+		try {
+			String ip = "";
+			try {
+				FileInputStream in = new FileInputStream("IPconfig.txt");  
+				InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
+				BufferedReader bufReader = new BufferedReader(inReader);  
+				String line = null; 
+				int writetime=0;
+
+				while((line = bufReader.readLine()) != null){ 
+					if(writetime==0){
+						writetime++;
+					}
+					else if(writetime==1){
+						writetime++;
+					}else if(writetime==2){
+						ip=line;
+						writetime++;
+					}
+				}  
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			String[] ipbuf = ip.split(":");
+			if(ipbuf.length != 1){
+				Date dt2 = new Date();
+				System.out.println("解锁定wcf获取方式开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2));
+
+				EndpointReference endpoint=new EndpointReference("http://"+ipbuf[1]+":8734/JN_WELD_Service/Service1/");
+				WeldServiceStub stu1=new WeldServiceStub("http://"+ipbuf[1]+":8734/JN_WELD_Service/Service1/");
+				stu1._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
+				stu1._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制.
+
+				ServiceCall sc = new ServiceCall();
+
+				CompositeType tt=new CompositeType();
+				tt.setWeldDataTable("");
+				tt.setCmdCode(19071601); //获取参数
+				sc.setCmd(tt);
+
+				ServiceCallResponse a = stu1.serviceCall(sc);
+				CompositeType rs= a.getServiceCallResult();
+				String xml = rs.getWeldDataTable();
+				//System.out.println(xml);
+
+				Date dt3 = new Date();
+				System.out.println("解锁定wcf获取方式结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3));
+
+				Document doc = DocumentHelper.parseText(xml);
+
+				Element rootElt = doc.getRootElement(); // 获取根节点
+
+				String[] headbuf = xml.split("<dt>");
+				String head = headbuf[0];
+
+				List nodes = rootElt.elements("dt");
+				int count = 0;
+				String docXmlText = "";
+				for (Iterator it = nodes.iterator(); it.hasNext();) {
+					Element elm = (Element) it.next();
+
+					Element elmbuf1 = elm.element("weldno");
+					Element elmbuf2 = elm.element("lock");
+					elmbuf1.setText(Integer.toString(Integer.valueOf(str.substring(10,14).toString(),16)));
+					elmbuf2.setText(Integer.toString(Integer.valueOf(str.substring(46,48).toString(),16)));
+					
+					docXmlText=doc.asXML();
+				}
+				Date dt4 = new Date();
+				System.out.println("解锁定wcf下发方法开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt4));
+				
+				String[] buf = docXmlText.split("\\\n");
+				tt.setWeldDataTable(buf[1]);
+				tt.setCmdCode(19071602); //下发参数
+				sc.setCmd(tt);
+				boolean suc = true;
+				try{
+					a = stu1.serviceCall(sc);
+					rs= a.getServiceCallResult();
+					xml = rs.getWeldDataTable();
+				}catch(Exception e){
+					e.printStackTrace();
+					suc = false;
+					ctx.writeAndFlush("FE5AA5001A"+str.substring(10,14)+"00000000000000000000000000021202000000").sync();
+				}
+				if(suc){
+					Date dt5 = new Date();
+					System.out.println("解锁定wcf解锁定方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt5));
+
+					ctx.writeAndFlush("FE5AA5001A"+str.substring(10,14)+"00000000000000000000000000021202000001").sync();
+
+					Date dt6 = new Date();
+					System.out.println("解锁定结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt6));
+				}
+			}
+			
+		} catch (Exception e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
+	}
+	
 	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {  
 		//super.channelReadComplete(ctx);  
 		ctx.flush();  
