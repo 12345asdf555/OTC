@@ -138,7 +138,7 @@ public class MainFrame extends JFrame {
 	public String fitemid;
 	public NettyServerHandler NS = new NettyServerHandler();
 	public NettyServerHandlerF NSF = new NettyServerHandlerF();
-	public Clientconnect clientconnect = new Clientconnect(NS,this);
+	public Clientconnect clientconnect = new Clientconnect(NS,NSF,this);
 	public TcpClientHandler TC = new TcpClientHandler();
 	public HashMap<String, SocketChannel> socketlist = new HashMap();
 	public int socketcount=0;
@@ -232,7 +232,7 @@ public class MainFrame extends JFrame {
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
 		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://119.3.100.103:8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://192.168.0.102:8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 
 		Calendar calendarmail = Calendar.getInstance();
@@ -453,7 +453,7 @@ public class MainFrame extends JFrame {
 
 			if(iffirst){
 				new Thread(work).start();
-				//new Thread(workf).start();
+				new Thread(workf).start();
 				new Thread(cli).start();
 				new Thread(pan).start();
 				iffirst = false;

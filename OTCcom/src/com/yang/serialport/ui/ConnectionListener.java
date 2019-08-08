@@ -35,6 +35,7 @@ public class ConnectionListener implements ChannelFutureListener {
 			  }, 1L, TimeUnit.SECONDS);  
 		}else{
 			  client.NS.chcli = socketChannel;
+			  client.NSF.chcli = socketChannel;
 		}
 	}
 	

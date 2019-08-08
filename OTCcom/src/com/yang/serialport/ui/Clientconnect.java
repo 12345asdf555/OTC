@@ -26,15 +26,17 @@ public class Clientconnect
 {  
   public MainFrame mainFrame;
   public NettyServerHandler NS;
+  public NettyServerHandlerF NSF;
   private EventLoopGroup loop = new NioEventLoopGroup();
   private String ip;
   private String fitemid; 
   public Bootstrap bootstrap = new Bootstrap();
   public ConnectionListener CL = new ConnectionListener(this);
   
-  public Clientconnect(NettyServerHandler NS, MainFrame mainFrame) {
+  public Clientconnect(NettyServerHandler NS, NettyServerHandlerF NSF, MainFrame mainFrame) {
 	// TODO Auto-generated constructor stub
 	  this.NS = NS;
+	  this.NSF = NSF;
 	  this.mainFrame = mainFrame;
   }
 
