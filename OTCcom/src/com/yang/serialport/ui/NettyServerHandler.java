@@ -796,11 +796,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					if(check6.equals(check6)){
 
 						StringBuilder sb = new StringBuilder(str);
-
-						sb.replace(34, 38, "0001");
-						sb.replace(70, 78, "00000001");
-						sb.replace(150, 158, "00000001");
-						sb.replace(230, 238, "00000001");
 						str = sb.toString();
 						
 						String weld = str.substring(14, 18);

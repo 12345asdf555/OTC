@@ -232,7 +232,7 @@ public class MainFrame extends JFrame {
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
 		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://192.168.0.102:8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://192.168.3.7:8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 
 		Calendar calendarmail = Calendar.getInstance();
