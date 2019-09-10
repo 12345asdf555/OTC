@@ -892,7 +892,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 											}else{
 												code = "00000000";
 											}
-											break;
 										}
 									}
 								}

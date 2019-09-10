@@ -69,12 +69,13 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 					}else{
 						for(int i=0;i<listarrayJN.size();i+=5){
 							if(listarrayJN.get(i).equals(JN[1])){
-								listarrayJN.set(i, JN[1]);
-								listarrayJN.set(i+1, JN[2]);
-								listarrayJN.set(i+2, JN[3]);
-								listarrayJN.set(i+3, JN[4]);
-								listarrayJN.set(i+4, JN[5]);
-								client.NS.listarrayJN  = listarrayJN;
+								for(int j=0;j<5;j++){
+									listarrayJN.remove(i);
+								}
+								for(int i1=1;i1<JN.length;i1++){
+									listarrayJN.add(JN[i1]);
+									client.NS.listarrayJN  = listarrayJN;
+								}
 							}
 						}
 					}
@@ -113,7 +114,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 
 				System.out.println(str);
 			}
-		}else if(str.substring(0,2).equals(("00"))){
+		}else if(str.length()==286){
 			
 			synchronized (client.mainFrame.socketlist) {
 
@@ -127,8 +128,25 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 						Entry<String, SocketChannel> entry = (Entry<String, SocketChannel>) webiter.next();
 						socketfail = entry.getKey();
 						SocketChannel socketcon = entry.getValue();
+						byte[] data=new byte[str.length()/2];
+						for (int i1 = 0; i1 < data.length; i1++)
+						{
+							String tstr1=str.substring(i1*2, i1*2+2);
+							Integer k=Integer.valueOf(tstr1,16);
+							data[i1]=(byte)k.byteValue();
+						}
 
-						socketcon.writeAndFlush(Unpooled.copiedBuffer((str).getBytes())).sync();
+						ByteBuf byteBuf = Unpooled.buffer();
+						byteBuf.writeBytes(data);
+
+						try{
+
+							socketcon.writeAndFlush(byteBuf).sync();
+
+						}catch (Exception e) {
+							listarraybuf.add(socketfail);
+							ifdo = true;
+						}
 
 					}catch (Exception e) {
 						listarraybuf.add(socketfail);
