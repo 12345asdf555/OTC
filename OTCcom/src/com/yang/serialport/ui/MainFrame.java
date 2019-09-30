@@ -124,6 +124,7 @@ public class MainFrame extends JFrame {
     public String fitemid;
     public NettyServerHandler NS = new NettyServerHandler();
     public Clientconnect clientconnect = new Clientconnect(NS,this);
+    public ClientconnectTest clientconnecttest = new ClientconnectTest(NS,this);
     public TcpClientHandler TC = new TcpClientHandler();
     public HashMap<String, SocketChannel> socketlist = new HashMap();
     public int socketcount=0;
@@ -214,8 +215,8 @@ public class MainFrame extends JFrame {
 		//webservice配置
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
-		//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://" + "localhost" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		//client = dcf.createClient("http://" + "119.3.100.103" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
 		//功能实现线程
@@ -424,6 +425,7 @@ public class MainFrame extends JFrame {
  	        if(iffirst){
  	 			new Thread(work).start();
  	 			new Thread(cli).start();
+ 	 			new Thread(clitest).start();
  	 			iffirst = false;
  	        }
  	        
@@ -525,6 +527,22 @@ public class MainFrame extends JFrame {
 			 } catch (Exception ex) { 
 	 			 ex.printStackTrace();
 	         }
+		}
+	};
+	
+	//socket连接服务器
+	public Runnable clitest =new Runnable(){
+
+		private String ip;
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			try{
+				clientconnecttest.run();
+			} catch (Exception ex) { 
+				ex.printStackTrace();
+			}
 		}
 	};
 	

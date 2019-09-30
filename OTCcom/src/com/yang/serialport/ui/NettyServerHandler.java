@@ -54,6 +54,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
     public ArrayList<String> listarrayJN = new ArrayList<String>();  //任务、焊工、焊机、状态
 	public JTextArea dataView = new JTextArea();
 	public SocketChannel chcli = null;
+	public SocketChannel chclitest = null;
 	public Date timetran;
 	public long timetran1;
 	public Date time11;
@@ -127,7 +128,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				  if(str.length()>=6){
 					  
 					  //基本版
-					  if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22")) && str.length()==288){
+					  if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22") || str.substring(10,12).equals("23")) && str.length()==288){
 						  
 						  str = trans(str);
 						  //str = transOTC(str);
@@ -136,6 +137,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
+				        	 chclitest.writeAndFlush(str).sync();
 					         dataView.append(" " + str + "\r\n");
 				          }catch(Exception ex){
 							 ex.printStackTrace();
@@ -183,6 +185,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 						  
 						  try{
 		        	  		  chcli.writeAndFlush(str).sync();
+		        	  		  chclitest.writeAndFlush(str).sync();
 							  dataView.append("上行:" + str + "\r\n");  
 				          }catch(Exception ex){
 							 ex.printStackTrace();

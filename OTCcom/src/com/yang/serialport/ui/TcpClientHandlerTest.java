@@ -17,7 +17,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.util.CharsetUtil;
 
 
-public class TcpClientHandler extends ChannelHandlerAdapter {
+public class TcpClientHandlerTest extends ChannelHandlerAdapter {
 	
 	public Clientconnect client;
 	public ClientconnectTest clientconnectTest;
@@ -26,16 +26,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 	public String socketfail;
 	public ArrayList<String> listarrayJN = new ArrayList<String>();
 	
-	public TcpClientHandler(Clientconnect client) {
-		// TODO Auto-generated constructor stub
-		this.client = client;
-	}
-	
-	public TcpClientHandler() {
-		
-	}
-	
-	public TcpClientHandler(ClientconnectTest clientconnectTest) {
+	public TcpClientHandlerTest(ClientconnectTest clientconnectTest) {
 		// TODO Auto-generated constructor stub
 		this.clientconnectTest = clientconnectTest;
 	}
@@ -213,7 +204,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
       eventLoop.schedule(new Runnable() {  
     	@Override  
         public void run() {  
-    		client.createBootstrap(new Bootstrap(),eventLoop);
+    		clientconnectTest.createBootstrap(new Bootstrap(),eventLoop);
         }  
       }, 1L, TimeUnit.SECONDS);  
       //super.channelInactive(ctx);  

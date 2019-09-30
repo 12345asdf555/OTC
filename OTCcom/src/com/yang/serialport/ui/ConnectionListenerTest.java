@@ -11,17 +11,17 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 //netty连接服务器,若断开自动检测重连
-public class ConnectionListener implements ChannelFutureListener {
+public class ConnectionListenerTest implements ChannelFutureListener {
 	public Clientconnect client;  
 	public ClientconnectTest clienttest;  
 	public SocketChannel socketChannel;
-	public ConnectionListener(Clientconnect client) {  
+	public ConnectionListenerTest(Clientconnect client) {  
 	    this.client = client;  
 	}  
-	public ConnectionListener() {
+	public ConnectionListenerTest() {
 		// TODO Auto-generated constructor stub
 	}
-	public ConnectionListener(ClientconnectTest clientconnectTest) {
+	public ConnectionListenerTest(ClientconnectTest clientconnectTest) {
 		// TODO Auto-generated constructor stub
 	    this.clienttest = clientconnectTest;  
 	}
@@ -35,11 +35,11 @@ public class ConnectionListener implements ChannelFutureListener {
 			        @Override  
 			        public void run() {  
 			          //开始连接
-			          client.createBootstrap(new Bootstrap(), loop);  
+			        	clienttest.createBootstrap(new Bootstrap(), loop);  
 			        }  
 			  }, 1L, TimeUnit.SECONDS);  
 		}else{
-			  client.NS.chcli = socketChannel;
+			  clienttest.NS.chclitest = socketChannel;
 		}
 	}
 	
