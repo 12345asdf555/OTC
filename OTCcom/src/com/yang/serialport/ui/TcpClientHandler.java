@@ -191,7 +191,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 					}
 		         }
 		         
-		         clientconnectTest.mainFrame.DateView(str);
+		         //clientconnectTest.mainFrame.DateView(str);
 		         
 		         if(ifdo){
 		        	 for(int i=0;i<listarraybuf.size();i++){
@@ -221,7 +221,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 	
     @Override  
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {  
-         ctx.close();  
+         //ctx.close();  
     } 
 	
 }

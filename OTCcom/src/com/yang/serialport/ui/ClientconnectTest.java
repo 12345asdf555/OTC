@@ -89,7 +89,7 @@ public class ClientconnectTest
           CLtest.socketChannel = socketChannel;
         }  
       });  
-      bootstrap.remoteAddress(ip, 5552);
+      bootstrap.remoteAddress(ip, 5562);
       bootstrap.connect().addListener(CLtest); 
     }  
     return bootstrap;  

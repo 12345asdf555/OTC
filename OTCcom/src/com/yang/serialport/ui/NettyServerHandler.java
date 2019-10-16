@@ -129,19 +129,19 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					  
 					  //基本版
 					  if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22") || str.substring(10,12).equals("23")) && str.length()==288){
-						  
+
 						  str = trans(str);
 						  //str = transOTC(str);
 						  //str = transJN(str);
 						  str=str.substring(0,286)+fitemid+"7D";
-				          
+
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
 				        	 chclitest.writeAndFlush(str).sync();
-					         dataView.append(" " + str + "\r\n");
+					         //dataView.append(" " + str + "\r\n");
 				          }catch(Exception ex){
 							 ex.printStackTrace();
-					         dataView.append(" " + str + "\r\n");
+					         //dataView.append(" " + str + "\r\n");
 				 			 //dataView.setText("服务器未开启" + "\r\n");
 				          }
 				          
@@ -157,10 +157,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				          
 				          try{
 				        	 chcli.writeAndFlush(str).sync();
-					         dataView.append(" " + str + "\r\n");
+					         //dataView.append(" " + str + "\r\n");
 				          }catch(Exception ex){
 							 ex.printStackTrace();
-					         dataView.append(" " + str + "\r\n");
+					         //dataView.append(" " + str + "\r\n");
 				 			 //dataView.setText("服务器未开启" + "\r\n");
 				          }
 				          
@@ -173,10 +173,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 				          
 				          try{
 				        	  chcli.writeAndFlush(str).sync();
-					          dataView.append("实时:" + str + "\r\n"); 
+					          //dataView.append("实时:" + str + "\r\n"); 
 				          }catch(Exception ex){
 							 ex.printStackTrace();
-				 			 dataView.setText("服务器未开启" + "\r\n");
+				 			 //dataView.setText("服务器未开启" + "\r\n");
 				          }
 				          
 				          str = "";
@@ -184,12 +184,12 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					  }else{
 						  
 						  try{
-		        	  		  chcli.writeAndFlush(str).sync();
+		        	  		  //chcli.writeAndFlush(str).sync();
 		        	  		  chclitest.writeAndFlush(str).sync();
-							  dataView.append("上行:" + str + "\r\n");  
+							  //dataView.append("上行:" + str + "\r\n");  
 				          }catch(Exception ex){
 							 ex.printStackTrace();
-				 			 dataView.setText("服务器未开启" + "\r\n");
+				 			 //dataView.setText("服务器未开启" + "\r\n");
 				          }
 						  
 						  str = "";

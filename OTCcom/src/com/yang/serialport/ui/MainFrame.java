@@ -25,11 +25,6 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 import net.sf.json.JSONObject;
 
-import java.awt.Color;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
@@ -66,19 +61,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -108,7 +90,7 @@ import org.apache.cxf.endpoint.Client;
 
 import com.yang.serialport.ui.*;
 
-public class MainFrame extends JFrame {
+public class MainFrame {
 	 
 	Connection c = null;
     Statement stmt = null;
@@ -139,20 +121,20 @@ public class MainFrame extends JFrame {
 	 */
 	public static final int HEIGHT = 360;
 
-	public JTextArea dataView = new JTextArea();
-	private JScrollPane scrollDataView = new JScrollPane(dataView);
-
-	// 串口设置面板
-	private JPanel serialPortPanel = new JPanel();
-	private JLabel baudrateLabel = new JLabel("波特率");
-	private JComboBox commChoice = new JComboBox();
-	private JComboBox baudrateChoice = new JComboBox();
-
-	// 操作面板
-	private JPanel operatePanel = new JPanel();
-	private JTextField dataInput = new JTextField();
-	private JButton serialPortOperate = new JButton("停止接收");
-	private JButton sendData = new JButton("开始接收");
+//	public JTextArea dataView = new JTextArea();
+//	private JScrollPane scrollDataView = new JScrollPane(dataView);
+//
+//	// 串口设置面板
+//	private JPanel serialPortPanel = new JPanel();
+//	private JLabel baudrateLabel = new JLabel("波特率");
+//	private JComboBox commChoice = new JComboBox();
+//	private JComboBox baudrateChoice = new JComboBox();
+//
+//	// 操作面板
+//	private JPanel operatePanel = new JPanel();
+//	private JTextField dataInput = new JTextField();
+//	private JButton serialPortOperate = new JButton("停止接收");
+//	private JButton sendData = new JButton("开始接收");
    
 	byte[] data;
 	public int socketnortype = 0;
@@ -208,15 +190,15 @@ public class MainFrame extends JFrame {
 		NS.fitemid = fitemid;
 		
 		//加载界面布局
-		initView();
-		initComponents();
+		//initView();
+		//initComponents();
 		
 
 		//webservice配置
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
 		client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-		//client = dcf.createClient("http://" + "119.3.100.103" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
+		//client = dcf.createClient("http://" + "localhost" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
 		//功能实现线程
@@ -227,11 +209,11 @@ public class MainFrame extends JFrame {
             public void run() {
 				ser();
 			}  
-        }, 3600000,3600000);
+        }, 300000,300000);
         
         ser();
 		
-		NS.dataView = this.dataView;
+		//NS.dataView = this.dataView;
 	}
 
 	//webservice获取焊工、焊机(采集模块)、任务(包括下发任务)对应id值
@@ -431,89 +413,11 @@ public class MainFrame extends JFrame {
  	        
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			dataView.append("Webservice未开启" + "\r\n");
+			//dataView.append("Webservice未开启" + "\r\n");
 			e.printStackTrace();
 		}			
 	}
 
-	//界面布局
-	public void initView() {
-		// 关闭程序
-		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		// 禁止窗口最大化
-		setResizable(false);
-
-		// 设置程序窗口居中显示
-		Point p = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getCenterPoint();
-		setBounds(p.x - WIDTH / 2, p.y - HEIGHT / 2, WIDTH, HEIGHT);
-		this.setLayout(null);
-
-		setTitle("Wifi采集器");
-	}
-
-	//界面布局
-	public void initComponents() {
-		// 数据显示
-		//dataView.setFocusable(false);
-		dataView.setEditable(false);
-		dataView.getDocument().addDocumentListener(new DocumentListener(){
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				SwingUtilities.invokeLater(new Runnable(){
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						if(dataView.getLineCount() >= 1000){
-							int end = 0;
-							try{
-								end = dataView.getLineEndOffset(500);
-							}catch (Exception e) {  
-                            }  
-							dataView.replaceRange("", 0, end);
-						}
-					}
-				});
-			}
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-		scrollDataView.setBounds(10, 10, 475, 300);
-		add(scrollDataView);
-
-		commChoice.setFocusable(false);
-		commChoice.setBounds(60, 25, 100, 20);
-		serialPortPanel.add(commChoice);
-
-		baudrateLabel.setForeground(Color.gray);
-		baudrateLabel.setBounds(10, 60, 40, 20);
-		serialPortPanel.add(baudrateLabel);
-
-		baudrateChoice.setFocusable(false);
-		baudrateChoice.setBounds(60, 60, 100, 20);
-		serialPortPanel.add(baudrateChoice);
-
-		// 操作
-		operatePanel.setBorder(BorderFactory.createTitledBorder("操作"));
-		operatePanel.setBounds(70, 220, 375, 100);
-		operatePanel.setLayout(null);
-
-		serialPortOperate.setFocusable(false);
-		serialPortOperate.setBounds(210, 40, 90, 30);
-
-		sendData.setFocusable(false);
-		sendData.setBounds(70, 40, 90, 30);
-	}
-	
 	//socket连接服务器
 	public Runnable cli =new Runnable(){
 
@@ -545,11 +449,6 @@ public class MainFrame extends JFrame {
 			}
 		}
 	};
-	
-	//点击事件关闭界面
-	private void closeSerialPort(java.awt.event.ActionEvent evt) {
-		System.exit(0);
-	}
 
 	//开启服务器供焊机连接
 	public Runnable work = new Runnable() {
@@ -592,7 +491,7 @@ public class MainFrame extends JFrame {
 	            
 	            //绑定端口，等待同步成功  
 	            ChannelFuture f;
-				f = b.bind(5555).sync();
+				f = b.bind(5560).sync();
 	            //等待服务端关闭监听端口  
 	            f.channel().closeFuture().sync(); 
 	        } catch (InterruptedException e) {
@@ -607,125 +506,87 @@ public class MainFrame extends JFrame {
 	};
 	
 	public static void main(String args[]) {
-		new MainFrame().setVisible(true);
-	}
-	
-	public void DateView(String datesend) {
-		// TODO Auto-generated method stub
-		dataView.append(datesend + "\r\n");
-		
+		//new MainFrame().setVisible(true);
+		new MainFrame();
 	}
 		
-	public Runnable ser =new Runnable(){
-		@Override
-		public void run() {
-			//任务webservice
-			try {
-				
-				try {
-					  FileInputStream in = new FileInputStream("IPconfig.txt");  
-			          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
-			          BufferedReader bufReader = new BufferedReader(inReader);  
-			          String line = null; 
-			          int writetime=0;
-						
-					    while((line = bufReader.readLine()) != null){ 
-					    	if(writetime==0){
-				                ip=line;
-				                writetime++;
-					    	}
-			          }  
+	//界面布局
+//	public void initView() {
+//		// 关闭程序
+//		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+//		// 禁止窗口最大化
+//		setResizable(false);
+//
+//		// 设置程序窗口居中显示
+//		Point p = GraphicsEnvironment.getLocalGraphicsEnvironment()
+//				.getCenterPoint();
+//		setBounds(p.x - WIDTH / 2, p.y - HEIGHT / 2, WIDTH, HEIGHT);
+//		this.setLayout(null);
+//
+//		setTitle("Wifi采集器");
+//	}
+
+	//界面布局
+//	public void initComponents() {
+//		// 数据显示
+//		//dataView.setFocusable(false);
+//		dataView.setEditable(false);
+//		dataView.getDocument().addDocumentListener(new DocumentListener(){
+//			@Override
+//			public void insertUpdate(DocumentEvent e) {
+//				// TODO Auto-generated method stub
+//				SwingUtilities.invokeLater(new Runnable(){
+//					@Override
+//					public void run() {
+//						// TODO Auto-generated method stub
+//						if(dataView.getLineCount() >= 1000){
+//							int end = 0;
+//							try{
+//								end = dataView.getLineEndOffset(500);
+//							}catch (Exception e) {  
+//                            }  
+//							dataView.replaceRange("", 0, end);
+//						}
+//					}
+//				});
+//			}
+//			@Override
+//			public void removeUpdate(DocumentEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//			@Override
+//			public void changedUpdate(DocumentEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		});
+//		scrollDataView.setBounds(10, 10, 475, 300);
+//		add(scrollDataView);
+//
+//		commChoice.setFocusable(false);
+//		commChoice.setBounds(60, 25, 100, 20);
+//		serialPortPanel.add(commChoice);
+//
+//		baudrateLabel.setForeground(Color.gray);
+//		baudrateLabel.setBounds(10, 60, 40, 20);
+//		serialPortPanel.add(baudrateLabel);
+//
+//		baudrateChoice.setFocusable(false);
+//		baudrateChoice.setBounds(60, 60, 100, 20);
+//		serialPortPanel.add(baudrateChoice);
+//
+//		// 操作
+//		operatePanel.setBorder(BorderFactory.createTitledBorder("操作"));
+//		operatePanel.setBounds(70, 220, 375, 100);
+//		operatePanel.setLayout(null);
+//
+//		serialPortOperate.setFocusable(false);
+//		serialPortOperate.setBounds(210, 40, 90, 30);
+//
+//		sendData.setFocusable(false);
+//		sendData.setBounds(70, 40, 90, 30);
+//	}
 	
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				//任务下发
-				/*iutil  =  new IsnullUtil();
-				dcf = JaxWsDynamicClientFactory.newInstance();
-				//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-				client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-				iutil.Authority(client);
-				
-				String obj1 = "{\"CLASSNAME\":\"junctionWebServiceImpl\",\"METHOD\":\"getWeldedJunctionAll\"}";
-				Object[] objects = client.invoke(new QName("http://webservice.ssmcxf.sshome.com/", "enterNoParamWs"),
-						new Object[] { obj1 });
-				String restr = objects[0].toString();
-		        JSONArray ary = JSONArray.parseArray(restr);
-		        
-		        ArrayList<String> listarraybuf = new ArrayList<String>();
-		        
-		        synchronized(listarrayJN){
-		        for(int i=0;i<ary.size();i++){
-			        String str = ary.getString(i);
-			        JSONObject js = JSONObject.fromObject(str);
-			        
-			        if(js.getString("OPERATESTATUS").equals("1")){
-		        		listarraybuf.add(js.getString("ID"));
-		        	}else{
-		        		
-		        		int count1=0;
-		        		for(int l=0;l<listarraybuf.size();l++){
-		        			if(listarraybuf.get(l).equals(js.getString("ID"))){
-		        				break;
-		        			}else{
-		        				count1++;
-		        				if(count1==listarraybuf.size()){
-			        				if(js.getString("OPERATESTATUS").equals("0") || js.getString("OPERATESTATUS").equals("2")){
-			    			        	listarrayJN.add(js.getString("ID"));
-			    			        	listarrayJN.add(js.getString("REWELDERID"));
-			    			        	listarrayJN.add(js.getString("MACHINEID"));
-			    			        	listarrayJN.add(js.getString("OPERATESTATUS"));
-			    			        	listarrayJN.add(js.getString("MACHINENO"));
-			    			        }
-		        				}
-		        			}
-		        		}
-		        	}
-		        }
-		        NS.listarrayJN = listarrayJN;
-		        }*/
-			        
-				//任务编号对应
-				iutil  =  new IsnullUtil();
-				dcf = JaxWsDynamicClientFactory.newInstance();
-				//client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-				client = dcf.createClient("http://" + ip + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
-				iutil.Authority(client);
-				String obj1 = "{\"CLASSNAME\":\"junctionWebServiceImpl\",\"METHOD\":\"getWeldedJunctionAll\"}";
-				Object[] objects1 = client.invoke(new QName("http://webservice.ssmcxf.sshome.com/", "enterNoParamWs"),
-						new Object[] { obj1 });
-				String restr1 = objects1[0].toString();
-		        JSONArray ary1 = JSONArray.parseArray(restr1);
-		        ArrayList<String> listjunction = new ArrayList<String>();
-				
-		        //焊工
-		        String obj11="{\"CLASSNAME\":\"welderWebServiceImpl\",\"METHOD\":\"getWelderAll\"}";
-		        String obj22="{\"STR\":\"\"}";
-		        Object[] objects11 = client.invoke(new QName("http://webservice.ssmcxf.sshome.com/", "enterTheWS"),
-		              new Object[] { obj11,obj22 });
-		        String restr11 = objects11[0].toString();
-		        JSONArray ary11 = JSONArray.parseArray(restr11);
-		        ArrayList<String> listwelder = new ArrayList<String>();
-		        
-		        //焊机
-		        String obj111="{\"CLASSNAME\":\"weldingMachineWebServiceImpl\",\"METHOD\":\"getGatherMachine\"}";
-		        Object[] objects111 = client.invoke(new QName("http://webservice.ssmcxf.sshome.com/", "enterNoParamWs"),
-		                  new Object[] { obj111 });
-		        String restr111 = objects111[0].toString();
-		        JSONArray ary111 = JSONArray.parseArray(restr111);
-		        ArrayList<String> listweld = new ArrayList<String>();
-			        
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				dataView.append("Webservice未开启" + "\r\n");
-				e.printStackTrace();
-			}		
-		}
-	};
- }  
+}  
 	 
