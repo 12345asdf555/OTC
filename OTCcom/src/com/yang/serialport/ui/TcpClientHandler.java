@@ -152,12 +152,12 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 	         
 			 }*/
 			 
-			 synchronized (clientconnectTest.mainFrame.socketlist) {
+			 synchronized (client.mainFrame.socketlist) {
 				 
 				 ArrayList<String> listarraybuf = new ArrayList<String>();
 	        	 boolean ifdo= false;
 					 
-				 Iterator<Entry<String, SocketChannel>> webiter = clientconnectTest.mainFrame.socketlist.entrySet().iterator();
+				 Iterator<Entry<String, SocketChannel>> webiter = client.mainFrame.socketlist.entrySet().iterator();
 		         while(webiter.hasNext()){
 		         	try{
 		         		
@@ -195,7 +195,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 		         
 		         if(ifdo){
 		        	 for(int i=0;i<listarraybuf.size();i++){
-		        		 clientconnectTest.mainFrame.socketlist.remove(listarraybuf.get(i));
+		        		 client.mainFrame.socketlist.remove(listarraybuf.get(i));
 	            	 }
 	             }
 			 }
