@@ -8,6 +8,8 @@ package com.yang.serialport.ui;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -52,10 +54,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -210,6 +215,117 @@ public class MainFrame {
 				ser();
 			}  
         }, 3000000,3000000);
+        
+        //重置时间
+        Timer tExit11 = null; 
+		tExit11 = new Timer();  
+        tExit11.schedule(new TimerTask() {
+			private String socketfail;
+			private String time;
+
+			@Override  
+            public void run() {
+				ser();
+				
+				//十分钟发送时间校准
+				Calendar d = Calendar.getInstance();
+				String year = Integer.toString(d.get(Calendar.YEAR));
+				String month = Integer.toString(d.get(Calendar.MONTH)+1);
+				int length2 = 2 - month.length();
+				if(length2!=2){
+					for(int i=0;i<length2;i++){
+						month = "0" + month;
+					}
+				}
+				String day = Integer.toString(d.get(Calendar.DAY_OF_MONTH));
+				int length3 = 2 - day.length();
+				if(length3!=2){
+					for(int i=0;i<length3;i++){
+						day = "0" + day;
+					}
+				}
+				String hour = Integer.toString(d.get(Calendar.HOUR_OF_DAY));
+				int length4 = 2 - hour.length();
+				if(length4!=2){
+					for(int i=0;i<length4;i++){
+						hour = "0" + hour;
+					}
+				}
+				String minutes = Integer.toString(d.get(Calendar.MINUTE));
+				int length5 = 2 - minutes.length();
+				if(length5!=2){
+					for(int i=0;i<length5;i++){
+						minutes = "0" + minutes;
+					}
+				}
+				String seconds = Integer.toString(d.get(Calendar.SECOND));
+				int length6 = 2 - seconds.length();
+				if(length6!=2){
+					for(int i=0;i<length6;i++){
+						seconds = "0" + seconds;
+					}
+				}
+				
+				String time = "7E0F010101450000" + year + month + day + hour + minutes + seconds + "007D";
+				
+				synchronized (socketlist) {
+					 
+					 ArrayList<String> listarraybuf = new ArrayList<String>();
+		        	 boolean ifdo= false;
+						 
+					 Iterator<Entry<String, SocketChannel>> webiter = socketlist.entrySet().iterator();
+			         while(webiter.hasNext()){
+			         	try{
+			         		
+			             	Entry<String, SocketChannel> entry = (Entry<String, SocketChannel>) webiter.next();
+			             	socketfail = entry.getKey();
+			             	SocketChannel socketcon = entry.getValue();
+			             	
+			             	byte[] b = new byte[time.length()/2];
+							
+							for(int i=0;i<time.length();i+=2){
+								if(i<=14 || i>=30){
+									String buf = time.substring(0+i,2+i);
+									b[i/2] = (byte) Integer.parseInt(buf,16);
+								}else{
+									String buf = time.substring(0+i,2+i);
+									b[i/2] = (byte) Integer.parseInt(buf);
+								}
+							}
+			             	
+					        ByteBuf byteBuf = Unpooled.buffer();
+					        byteBuf.writeBytes(b);
+					        
+					        try{
+					        	if(socketcon.isOpen() && socketcon.isActive() && socketcon.isWritable()) {
+						        	socketcon.writeAndFlush(byteBuf).sync();
+					        	}else {
+						        	listarraybuf.add(socketfail);
+			 	                    ifdo = true;
+					        	}
+				             	
+					        }catch (Exception e) {
+					        	listarraybuf.add(socketfail);
+		 	                    ifdo = true;
+							}
+			             	
+			         	}catch (Exception e) {
+			         		//client.mainFrame.DateView("数据接收错误" + "\r\n");
+							//webiter = socketlist.entrySet().iterator();
+						}
+			         }
+			         
+			         //clientconnectTest.mainFrame.DateView(str);
+			         
+			         if(ifdo){
+			        	 for(int i=0;i<listarraybuf.size();i++){
+			        		 socketlist.remove(listarraybuf.get(i));
+		            	 }
+		             }
+				 }
+				
+			}  
+        }, 600000,600000);
         
         ser();
 		
