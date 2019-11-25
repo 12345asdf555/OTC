@@ -197,8 +197,8 @@ public class MainFrame {
 		//webservice配置
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
-		//client = dcf.createClient("http://" + ip + ":8080/IWELDMES_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("http://" + "119.3.100.103" + ":8080/IWELDMES_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://" + ip + ":8080/IWELDMES_Service/cIWJNWebService?wsdl");
+		//client = dcf.createClient("http://" + "119.3.100.103" + ":8080/CIWJN_Service/cIWJNWebService?wsdl");
 		iutil.Authority(client);
 		
 		//功能实现线程
@@ -209,7 +209,7 @@ public class MainFrame {
             public void run() {
 				ser();
 			}  
-        }, 300000,300000);
+        }, 3000000,3000000);
         
         ser();
 		
@@ -407,7 +407,7 @@ public class MainFrame {
  	        if(iffirst){
  	 			new Thread(work).start();
  	 			new Thread(cli).start();
- 	 			new Thread(clitest).start();
+ 	 			//new Thread(clitest).start();
  	 			iffirst = false;
  	        }
  	        
@@ -491,7 +491,7 @@ public class MainFrame {
 	            
 	            //绑定端口，等待同步成功  
 	            ChannelFuture f;
-				f = b.bind(5560).sync();
+				f = b.bind(5555).sync();
 	            //等待服务端关闭监听端口  
 	            f.channel().closeFuture().sync(); 
 	        } catch (InterruptedException e) {
