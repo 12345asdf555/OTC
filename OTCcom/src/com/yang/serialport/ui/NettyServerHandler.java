@@ -186,8 +186,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					}else{
 
 						try{
-							chcli.writeAndFlush(str).sync();
-							//chclitest.writeAndFlush(str).sync();
+							//chcli.writeAndFlush(str).sync();
+							chclitest.writeAndFlush(str).sync();
 							//dataView.append("上行:" + str + "\r\n");  
 						}catch(Exception ex){
 							ex.printStackTrace();
@@ -238,7 +238,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 						String junction1 = str.substring(76, 84);
 						String junction2 = str.substring(156, 164);
 						String junction3 = str.substring(236, 244);
-
+						
 						//江南任务模式
 						if(Integer.parseInt(welder,16)==0 && Integer.parseInt(junction1,16)==0 && Integer.parseInt(junction2,16)==0 && Integer.parseInt(junction3,16)==0){
 
