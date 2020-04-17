@@ -198,7 +198,6 @@ public class MainFrame {
 		//initView();
 		//initComponents();
 		
-
 		//webservice配置
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
@@ -589,7 +588,7 @@ public class MainFrame {
 	                public void initChannel(SocketChannel chsoc) throws Exception {
 						synchronized (socketlist) {
 						//编码解码
-						chsoc.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 1, 1, 0, 0));    
+						chsoc.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 1, 2, 0, 0));    
 	                	chsoc.pipeline().addLast("frameEncoder", new LengthFieldPrepender(1));
 	                	//加入编码解码之后,不能加入utf-8编码,加入之后0x80之后的数错误
 	                	//chsoc.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));    

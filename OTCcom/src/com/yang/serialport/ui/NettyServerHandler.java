@@ -127,6 +127,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					}
 				}
 
+				//str = "7E8E01010122000200010001202020202020202000011402180f280400C800BE001400C800BE00000001030C0200DC00B400D200AA0100000000000100020003000400050006000700080009000000010002000300040005000600070008000100020003000400050006000700080009001402180f280500C800BE001400C800BE00000001030C0200DC00B400D200AA0100000000000100020003000400050006000700080009000000010002000300040005000600070008000100020003000400050006000700080009001402180f280600C800BE001400C800BE00000001030C0200DC00B400D200AA010000000000010002000300040005000600070008000900000001000200030004000500060007000800010002000300040005000600070008000900007D";
+				//System.out.println(str.length() + ":  " + str);
 				if(str.length()>=6){
 
 					//基本版
@@ -149,7 +151,25 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 
 						str = "";
 
-						//欧华纬华
+					//西安版本
+					}else if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22") || str.substring(10,12).equals("23")) && str.length()==594){
+
+						str = transxian(str);
+						str=str.substring(0,592)+fitemid+"7D";
+
+						try{
+							chcli.writeAndFlush(str).sync();
+							//chclitest.writeAndFlush(str).sync();
+							//dataView.append(" " + str + "\r\n");
+						}catch(Exception ex){
+							ex.printStackTrace();
+							//dataView.append(" " + str + "\r\n");
+							//dataView.setText("服务器未开启" + "\r\n");
+						}
+
+						str = "";
+
+					//欧华纬华
 					}else if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22")) && str.length()==318){
 
 						str = transohwh(str);
@@ -390,7 +410,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 							if(listwelder.size()==0){
 								sb.replace(40, 44, "0000");
 							}else{
-								for(int a=0;a<listwelder.size();a+=2){
+								sb.replace(40, 44, "0000");
+								/*for(int a=0;a<listwelder.size();a+=2){
 									if(Integer.valueOf(listwelder.get(a+1)) == (Integer.parseInt(welder,16))){
 										String welderid = listwelder.get(a);
 
@@ -411,7 +432,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 											countwelder = 0;
 										}
 									}
-								}
+								}*/
 							}
 
 							//焊口编号对应id(有三组数据的焊口)
@@ -420,7 +441,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 								sb.replace(156, 164, "00000000");
 								sb.replace(236, 244, "00000000");
 							}else{
-								for(int a=0;a<listjunction.size();a+=2){
+								sb.replace(76, 84, "00000000");
+								sb.replace(156, 164, "00000000");
+								sb.replace(236, 244, "00000000");
+								/*for(int a=0;a<listjunction.size();a+=2){
 									if(Integer.valueOf(listjunction.get(a+1)) == (Integer.parseInt(junction1,16))){
 										String junctionid = listjunction.get(a);
 
@@ -487,7 +511,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 											countjunction = 0;
 										}
 									}
-								}
+								}*/
 							}
 						}
 
@@ -499,6 +523,108 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			return str;
 		}
 
+		private String transxian(String str) {
+			// TODO Auto-generated method stub
+
+			if (str.length() == 594) {
+
+				StringBuilder sb = new StringBuilder(str);
+
+				String weld = str.substring(16, 20);
+				String welder = str.substring(40, 44);
+				String junction1 = str.substring(76, 84);
+				String junction2 = str.substring(258, 266);
+				String junction3 = str.substring(440, 448);
+
+				//无任务下发模式
+				int countweld = 0;
+				int countwelder = 0;
+				int countjunction = 0;
+
+				//焊机编号对应id
+				if(listweld.size()==0){
+					sb.replace(16, 20, "0000");
+					sb.replace(20, 24, "0000");
+				}else{
+					for(int a=0;a<listweld.size();a+=4){
+						if(Integer.valueOf(listweld.get(a+1)) == (Integer.parseInt(weld,16))){
+							String gatherid = listweld.get(a);
+							String weldid = listweld.get(a+2);
+
+							if(gatherid.length() != 4){
+								int length = 4 - gatherid.length();
+								for(int b=0;b<length;b++){
+									gatherid = "0" + gatherid;
+								}
+							}
+
+							if(weldid.length() != 4){
+								int length = 4 - weldid.length();
+								for(int b=0;b<length;b++){
+									weldid = "0" + weldid;
+								}
+							}
+
+							sb.replace(16, 20, gatherid);
+							sb.replace(20, 24, weldid);
+							countweld = 0;
+
+						}else{
+							countweld++;
+							if(countweld == listweld.size()/4){
+								sb.replace(16, 20, "0000");
+								sb.replace(20, 24, "0000");
+								countweld = 0;
+							}
+						}
+					}
+				}
+
+				//焊工编号对应id
+				if(listwelder.size()==0){
+					sb.replace(40, 44, "0000");
+				}else{
+					for(int a=0;a<listwelder.size();a+=2){
+						if(Integer.valueOf(listwelder.get(a+1)) == (Integer.parseInt(welder,16))){
+							String welderid = listwelder.get(a);
+
+							if(welderid.length() != 4){
+								int length = 4 - welderid.length();
+								for(int b=0;b<length;b++){
+									welderid = "0" + welderid;
+								}
+							}
+
+							sb.replace(40, 44, welderid);
+							countwelder = 0;
+
+						}else{
+							countwelder++;
+							if(countwelder == listwelder.size()/2){
+								sb.replace(40, 44, "0000");
+								countwelder = 0;
+							}
+						}
+					}
+				}
+
+				//焊口编号对应id(有三组数据的焊口)
+				if(listjunction.size()==0){
+					sb.replace(76, 84, "00000000");
+					sb.replace(258, 266, "00000000");
+					sb.replace(440, 448, "00000000");
+				}else{
+					sb.replace(76, 84, "00000000");
+					sb.replace(258, 266, "00000000");
+					sb.replace(440, 448, "00000000");
+				}
+
+				str = sb.toString();
+
+			}
+			return str;
+		}
+		
 		private String transohwh(String str) {
 			// TODO Auto-generated method stub
 
