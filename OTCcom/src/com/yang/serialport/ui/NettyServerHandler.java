@@ -139,7 +139,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 
 						try{
 							chcli.writeAndFlush(str).sync();
-							chclitest.writeAndFlush(str).sync();
+							//chclitest.writeAndFlush(str).sync();
 							//dataView.append(" " + str + "\r\n");
 						}catch(Exception ex){
 							ex.printStackTrace();
@@ -186,8 +186,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					}else{
 
 						try{
-							//chcli.writeAndFlush(str).sync();
-							chclitest.writeAndFlush(str).sync();
+							chcli.writeAndFlush(str).sync();
+							//chclitest.writeAndFlush(str).sync();
 							//dataView.append("上行:" + str + "\r\n");  
 						}catch(Exception ex){
 							ex.printStackTrace();

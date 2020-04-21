@@ -203,8 +203,8 @@ public class MainFrame {
 		iutil  =  new IsnullUtil();
 		dcf = JaxWsDynamicClientFactory.newInstance();
 		//client = dcf.createClient("http://" + ip + ":8080/IWELDMES_Service/cIWJNWebService?wsdl");
-		//client = dcf.createClient("http://" + "119.3.100.103" + ":8080/IWELDMES_Service/cIWJNWebService?wsdl");
-		client = dcf.createClient("https://www.rilandweldmes.com/IWELDMES_Service/cIWJNWebService?wsdl");
+		client = dcf.createClient("http://" + "119.3.100.103" + ":8080/IWELDMES_Service/cIWJNWebService?wsdl");
+		//client = dcf.createClient("https://www.rilandweldmes.com/IWELDMES_Service/cIWJNWebService?wsdl");
 		
 		iutil.Authority(client);
 		
@@ -520,7 +520,7 @@ public class MainFrame {
  	        if(iffirst){
  	 			new Thread(work).start();
  	 			new Thread(cli).start();
- 	 			new Thread(clitest).start();
+ 	 			//new Thread(clitest).start();
  	 			iffirst = false;
  	        }
  	        
@@ -604,7 +604,7 @@ public class MainFrame {
 	            
 	            //绑定端口，等待同步成功  
 	            ChannelFuture f;
-				f = b.bind(5560).sync();
+				f = b.bind(5580).sync();
 	            //等待服务端关闭监听端口  
 	            f.channel().closeFuture().sync(); 
 	        } catch (InterruptedException e) {
