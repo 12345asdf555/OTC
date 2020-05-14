@@ -121,57 +121,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 			Date dt1 = null;
 			Date dt2 = null;
 			Date dt3 = null;
+
+			dt1 = new Date();
+			List nodes = null;
 			try{
-
-				dt1 = new Date();
-
-				//old
-				/*try {
-					  FileInputStream in = new FileInputStream("IPconfig.txt");  
-			          InputStreamReader inReader = new InputStreamReader(in, "UTF-8");  
-			          BufferedReader bufReader = new BufferedReader(inReader);  
-			          String line = null; 
-			          int writetime=0;
-
-					    while((line = bufReader.readLine()) != null){ 
-					    	if(writetime==0){
-				                writetime++;
-					    	}
-					    	else if(writetime==1){
-					    		writetime++;
-					    	}else{
-				                ip=line;
-					    	}
-			          }  
-
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					WeldServiceStub stu=new WeldServiceStub("http://"+ip+":8734/JN_WELD_Service/Service1/");
-			        stu._getServiceClient().getOptions().setProperty(HTTPConstants.REUSE_HTTP_CLIENT,true); 
-			        stu._getServiceClient().getOptions().setProperty(HTTPConstants.CHUNKED, "false");//设置不受限制*/
-
-
-
-				//dt2 = new Date();
-				//EndpointReference endpoint=new EndpointReference("http://"+ip+":8734/JN_WELD_Service/Service1/");
-
-
-				//stu._getServiceClient().sendto
-				//stu._getServiceClient().setTargetEPR(endpoint);~
-				//stu._getServiceClient().getOptions().setTo(endpoint);;
-
-
-				//stu._getServiceClient().getOptions().setProperty(AddressingConstants., org.apache.axis2.addressing.AddressingConstants.Final.WSA_NAMESPACE);
-				//int setWebServiceTimeOutInSeconds=mySession.getVariable(IProjectVariables.SET_WEB_SERVICE_TIME_OUT_IN_SECONDS).getSimpleVariable().getIntValue();
-				//stu._getServiceClient().getOptions().setTimeOutInMilliSeconds(setWebServiceTimeOutInSeconds*1000);
-
-
 				ServiceCall sc = new ServiceCall();
 
 				CompositeType tt=new CompositeType();
@@ -190,7 +143,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 
 				Element rootElt = doc.getRootElement(); // 获取根节点
 
-				List nodes = rootElt.elements("dt");
+				nodes = rootElt.elements("dt");
+			}catch(Exception e){
+				dataView.setText("wcf服务器未开启" + "\r\n");
+				e.printStackTrace();
+			}
+			
+			if(nodes != null){
 				String str1 = "";
 				for (Iterator it = nodes.iterator(); it.hasNext();) {
 					count1++;
@@ -199,6 +158,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					Element elmbuf1 = elm.element("state");
 
 					if(!elmbuf1.getStringValue().equals("关闭")){
+						//System.out.println(elmbuf1.getStringValue());
 						/*                    for(Iterator it1=elm.elementIterator();it1.hasNext();){
 			                    Element element = (Element) it1.next();
 			                    json.put(element.getName(), element.getStringValue());
@@ -640,22 +600,26 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 
 						str1 = str1 + channel + wa_up + wv_up + wa_down + wv_down + "00177D";
 						//dataView.append("松下:" + str1 + "\r\n");
-						chcli.writeAndFlush(str1).sync();
+						if(str1.length() == 124){
+							try{
+								chcli.writeAndFlush(str1).sync();
+							}catch(Exception e){
+								dataView.setText("wcf服务器未开启" + "\r\n");
+								e.printStackTrace();
+							}
+						}
 					}
 				}
-			} catch (Exception e) {
-				// TODO 自动生成的 catch 块
-				dataView.setText("wcf服务器未开启" + "\r\n");
-				e.printStackTrace();
-			}
 
-			Date dt4 = new Date();
-			dataView.append("实时开始："+DateTools.format("YY-MM-dd hh:mm:ss", dt1) + "\r\n");
-			//dataView.append("实时调用wcf方法开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2) + "\r\n");
-			//dataView.append("实时调用wcf方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3) + "\r\n");
-			dataView.append("数据条数："+ Integer.toString(count1) + "\r\n");
-			dataView.append("实时结束："+DateTools.format("YY-MM-dd hh:mm:ss", dt4) + "\r\n");
-			dataView.append("\r\n");
+				Date dt4 = new Date();
+				dataView.append("实时开始："+DateTools.format("YY-MM-dd hh:mm:ss", dt1) + "\r\n");
+				//dataView.append("实时调用wcf方法开始："+DateTools.format("YY-MM-DD hh:mm:ss", dt2) + "\r\n");
+				//dataView.append("实时调用wcf方法结束："+DateTools.format("YY-MM-DD hh:mm:ss", dt3) + "\r\n");
+				dataView.append("数据条数："+ Integer.toString(count1) + "\r\n");
+				dataView.append("实时结束："+DateTools.format("YY-MM-dd hh:mm:ss", dt4) + "\r\n");
+				dataView.append("\r\n");
+			}
+			
 		}
 
 	};
@@ -704,6 +668,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					}
 				}
 
+				//chcli.writeAndFlush(str).sync();
 				if(str.length()>=6){
 
 					if(str.substring(0,2).equals("7E") && (str.substring(10,12).equals("22")) && str.length()==282){
@@ -750,6 +715,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					}else{
 
 						try{
+							str=str.substring(0,120)+fitemid+"7D";
 							chcli.writeAndFlush(str).sync();
 							dataView.append("上行:" + str + "\r\n"); 
 						}catch(Exception ex){
