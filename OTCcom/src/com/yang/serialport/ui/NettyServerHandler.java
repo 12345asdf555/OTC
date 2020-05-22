@@ -712,6 +712,14 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 
 						str = "";
 
+					}else if(str.substring(0,2).equals("7E") && (str.length()==38)){
+						try{
+							chcli.writeAndFlush(str).sync();
+							dataView.append("上行:" + str + "\r\n"); 
+						}catch(Exception ex){
+							ex.printStackTrace();
+							dataView.setText("服务器未开启" + "\r\n");
+						}
 					}else{
 
 						try{
