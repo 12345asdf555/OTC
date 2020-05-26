@@ -81,8 +81,8 @@ public class Clientconnect
       bootstrap.handler(new ChannelInitializer<SocketChannel>() {  
         @Override  
         protected void initChannel(SocketChannel socketChannel) throws Exception {  
-    	  //socketChannel.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));    
-    	  //socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(4));    
+    	  socketChannel.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));    
+    	  socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(4));    
     	  socketChannel.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));    
     	  socketChannel.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8)); 
           socketChannel.pipeline().addLast(handler);  

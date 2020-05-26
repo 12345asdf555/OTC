@@ -126,7 +126,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 						str+=r;  
 					}
 				}
-
 				if(str.length()>=6){
 
 					//基本版
@@ -185,6 +184,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 
 					}else{
 
+						System.out.println(str);
 						try{
 							chcli.writeAndFlush(str).sync();
 							//chclitest.writeAndFlush(str).sync();
