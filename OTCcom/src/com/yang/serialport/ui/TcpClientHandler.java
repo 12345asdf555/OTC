@@ -282,9 +282,9 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 			//松下锁定通道
 			wcflock(str,ctx); 
 
-		}else{    //处理下发和上传
+		}else if(!str.substring(0,1).equals("{")){    //处理下发和上传
 			synchronized (client.mainFrame.socketlist) {
-
+				System.out.println("aaa");
 				ArrayList<String> listarraybuf = new ArrayList<String>();
 				boolean ifdo= false;
 
