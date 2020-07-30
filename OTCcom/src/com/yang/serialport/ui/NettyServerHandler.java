@@ -723,7 +723,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter{
 					}else{
 
 						try{
-							str=str.substring(0,120)+fitemid+"7D";
+							//str=str.substring(0,120)+fitemid+"7D";
 							chcli.writeAndFlush(str).sync();
 							dataView.append("上行:" + str + "\r\n"); 
 						}catch(Exception ex){

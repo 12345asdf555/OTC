@@ -284,7 +284,7 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 
 		}else if(!str.substring(0,1).equals("{")){    //处理下发和上传
 			synchronized (client.mainFrame.socketlist) {
-				System.out.println("aaa");
+				//System.out.println("aaa");
 				ArrayList<String> listarraybuf = new ArrayList<String>();
 				boolean ifdo= false;
 
@@ -814,16 +814,16 @@ public class TcpClientHandler extends ChannelHandlerAdapter {
 						yiyuan.setText(Integer.valueOf(str.substring(114,116),16).toString());
 
 						Element dwaup = elm.element("dwa_up");
-						dwaup.setText(Integer.valueOf(str.substring(124,128),16).toString());
+						dwaup.setText("100");
 
 						Element dwadown = elm.element("dwa_down");
-						dwadown.setText(Integer.valueOf(str.substring(128,132),16).toString());
+						dwadown.setText("100");
 
 						Element dwaouttime = elm.element("dwa_outtime");
 						dwaouttime.setText(Integer.valueOf(str.substring(148,150),16).toString());
 
 						Element dwaiouttime = elm.element("dwai_outtime");
-						dwaiouttime.setText(Integer.valueOf(str.substring(150,152),16).toString());
+						dwaiouttime.setText("10");
 
 						Element waup = elm.element("wa_up");
 						waup.setText(Integer.valueOf(str.substring(152,156),16).toString());
